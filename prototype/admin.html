@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin — The Ellison Group (demo)</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="widgets.css">
+</head>
+<body>
+<a class="skip" href="#page">Skip to content</a>
+<div class="app" id="app">
+  <aside class="side" id="side" aria-label="Admin navigation">
+    <div class="brand"><i aria-hidden="true">E</i><span>The Ellison Group<small>Admin · Demo</small></span></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="sfoot">
+      <a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg><span>Open public site</span></a>
+      <button id="collapse" type="button" aria-label="Collapse sidebar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg><span>Collapse</span></button>
+    </div>
+  </aside>
+  <div class="mscrim" id="mscrim"></div>
+  <div class="main">
+    <header class="top">
+      <button class="burger" id="burger" aria-label="Open navigation" aria-expanded="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <span class="demo" title="Mock data only">DEMO / PROTOTYPE</span>
+      <span class="sp"></span>
+      <a class="pub" href="index.html">View public site →</a>
+      <div class="prof" id="prof"></div>
+    </header>
+    <main class="page" id="page" tabindex="-1"></main>
+  </div>
+</div>
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Details" aria-hidden="true"></aside>
+<script src="store.js"></script>
+<script src="widgets.js"></script>
+<script src="chat.js"></script>
+<script src="admin.js"></script>
+<script src="admin-pages.js"></script>
+</body>
+</html>
