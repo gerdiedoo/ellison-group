@@ -15,3 +15,5 @@ for migration in supabase/migrations/*.sql; do
   docker exec -i "$test_container" psql -U postgres -v ON_ERROR_STOP=1 < "$migration"
 done
 docker exec -i "$test_container" psql -U postgres -v ON_ERROR_STOP=1 < tests/database/permissions.sql
+
+docker exec -i "$test_container" psql -U postgres -v ON_ERROR_STOP=1 < tests/database/foundation.sql

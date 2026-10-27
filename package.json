@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "test:db": "bash tests/database/run.sh"
+    "test:db": "bash tests/database/run.sh",
+    "verify:prototype": "node scripts/verify-prototype.mjs",
+    "db:types": "node scripts/generate-database-types.mjs"
   },
   "dependencies": {
     "next": "16.4.3",

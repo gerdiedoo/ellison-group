@@ -2,6 +2,7 @@ import "server-only";
 import { createHash, randomBytes } from "node:crypto";
 import { cookies, headers } from "next/headers";
 import { privileged } from "@/lib/supabase/server";
+import { serverEnvironment } from "@/lib/env";
 export function hash(value: string) {
   return createHash("sha256").update(value).digest("hex");
 }
@@ -23,9 +24,7 @@ export async function visitor(create = false) {
 export async function checkOrigin() {
   const h = await headers();
   const origin = h.get("origin");
-  const expected = new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
-  ).origin;
+  const expected = serverEnvironment().NEXT_PUBLIC_SITE_URL;
   if (origin !== expected) throw new Error("Invalid request origin");
 }
 export async function rateLimit(
@@ -35,7 +34,7 @@ export async function rateLimit(
   identity?: string,
 ) {
   const h = await headers();
-  const salt = process.env.RATE_LIMIT_SALT;
+  const salt = serverEnvironment().RATE_LIMIT_SALT;
   if (!salt)
     throw new Error(
       "Online requests are not available yet. Please call our team.",

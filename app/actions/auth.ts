@@ -1,9 +1,9 @@
 "use server";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { supabase, configured } from "@/lib/supabase/server";
 import { safeNext, emailSchema } from "@/lib/validation";
 import { checkOrigin, rateLimit } from "@/lib/security";
+import { serverEnvironment } from "@/lib/env";
 export async function signIn(form: FormData) {
   let dest = "";
   try {
@@ -28,13 +28,12 @@ export async function googleSignIn(form: FormData) {
   let url = "";
   try {
     await checkOrigin();
-    if (process.env.GOOGLE_OAUTH_ENABLED !== "true")
+    const env = serverEnvironment();
+    if (!env.GOOGLE_OAUTH_ENABLED)
       throw new Error("Google sign-in is not configured");
     await rateLimit("oauth", 20, 600);
     const db = await supabase();
-    const site =
-      process.env.NEXT_PUBLIC_SITE_URL ||
-      new URL((await headers()).get("origin")!).origin;
+    const site = env.NEXT_PUBLIC_SITE_URL;
     const next = safeNext(String(form.get("next") || "/favorites"));
     const { data, error } = await db.auth.signInWithOAuth({
       provider: "google",

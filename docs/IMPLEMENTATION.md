@@ -23,6 +23,10 @@ Use original SVGs as explicitly labeled illustrations until staff upload photogr
 
 ## Completion and external setup boundary
 
-All six implementation phases are complete in source. Local TypeScript, lint, production build, unit tests, browser flows and isolated PostgreSQL permissions are verified. The configured-project acceptance checks (Auth/OAuth, Storage HTTP, Gemini and authenticated full-browser CRUD) remain external setup tasks, listed explicitly in README and TEST_RESULTS. Nothing was deployed.
+The prior implementation added routes and integrations for all six phases. The detailed follow-up audit in `PROTOTYPE_INVENTORY.md` records remaining original interaction/visual parity rather than claiming every prototype behavior is complete. The foundation is established; Local TypeScript, lint, production build, unit tests, browser flows and isolated PostgreSQL permissions are verified. The configured-project acceptance checks (Auth/OAuth, Storage HTTP, Gemini and authenticated full-browser CRUD) remain external setup tasks, listed explicitly in README and TEST_RESULTS. Nothing was deployed.
 
 Public sections map to dedicated App Router pages, with the original editorial sections retained on the homepage. Prototype property dialogs became shareable property routes with galleries; form dialogs became reusable validated forms. Hash-route admin pages became server-protected route segments. Settings and all functional edits persist to Supabase; mock resets, sign-in choosers, simulated notifications and local CRM state were removed from the runtime.
+
+## Foundation follow-up — October 27, 2026
+
+Every uploaded file was reviewed and verified against the archive. See `PROTOTYPE_INVENTORY.md`, `ROUTE_MAP.md` and `prototype-manifest.json`. Existing pages/assets remain unchanged. The follow-up strengthens typed inserts and FK metadata, validates configuration, forwards the installed Supabase SSR SDK’s refresh headers and cookies, and adds migration 005 to revoke grants that bypass RLS and backfill existing users as visitors. Tests exercise refresh behavior, malformed configuration, compile-time type contracts and real PostgreSQL permission enforcement.

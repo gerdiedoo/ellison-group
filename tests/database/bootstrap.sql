@@ -14,3 +14,9 @@ grant usage on schema public,auth,storage to anon,authenticated,service_role;
 grant all on all tables in schema storage to anon,authenticated,service_role;
 alter default privileges in schema public grant all on tables to service_role;
 alter default privileges in schema public grant all on sequences to service_role;
+
+-- Reproduce broad host defaults so migrations must revoke non-RLS privileges.
+alter default privileges in schema public grant all on tables to public, anon, authenticated;
+alter default privileges in schema public grant all on sequences to public, anon, authenticated;
+-- This account existed before the application installed its signup trigger.
+insert into auth.users(id, raw_user_meta_data) values('00000000-0000-4000-8000-000000000004','{"full_name":"Existing Account","role":"admin"}');

@@ -3,18 +3,20 @@ import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import type { Database } from "@/lib/database.types";
+import { publicEnvironment, serverEnvironment } from "@/lib/env";
 export const configured = () =>
-  Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-  );
+  Boolean(publicEnvironment().NEXT_PUBLIC_SUPABASE_URL);
 export async function supabase() {
-  if (!configured())
+  const env = publicEnvironment();
+  if (
+    !env.NEXT_PUBLIC_SUPABASE_URL ||
+    !env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+  )
     throw new Error("Supabase is not configured. See README.md.");
   const jar = await cookies();
   return createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     {
       cookies: {
         getAll: () => jar.getAll(),
@@ -32,11 +34,17 @@ export async function supabase() {
   );
 }
 export function privileged() {
-  if (!configured() || !process.env.SUPABASE_SERVICE_ROLE_KEY)
+  const env = publicEnvironment();
+  const server = serverEnvironment();
+  if (
+    !env.NEXT_PUBLIC_SUPABASE_URL ||
+    !env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    !server.SUPABASE_SERVICE_ROLE_KEY
+  )
     throw new Error("Supabase server credentials are not configured.");
   return createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY,
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    server.SUPABASE_SERVICE_ROLE_KEY,
     { auth: { persistSession: false, autoRefreshToken: false } },
   );
 }

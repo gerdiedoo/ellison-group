@@ -1,4 +1,4 @@
-// Schema-aligned types. Regenerate with `supabase gen types typescript --local` after migrations.
+// Schema-aligned types. Regenerate with `npm run db:types` after applying migrations.
 export type Json =
   | string
   | number
@@ -107,32 +107,136 @@ export type Activity = {
   details: Json;
   created_at: string;
 };
-type Table<R> = {
-  Row: R;
-  Insert: Partial<R>;
-  Update: Partial<R>;
-  Relationships: [];
+// PostgreSQL defaults make only non-defaulted, non-null columns mandatory on insert.
+// FK metadata is provided for typed PostgREST relationships in the public schema.
+type Relation<
+  Name extends string,
+  Column extends string,
+  Target extends string,
+  TargetColumn extends string = "id",
+> = {
+  foreignKeyName: Name;
+  columns: [Column];
+  isOneToOne: false;
+  referencedRelation: Target;
+  referencedColumns: [TargetColumn];
 };
+type Table<
+  Row,
+  Required extends keyof Row,
+  Relationships extends object[] = [],
+> = {
+  Row: Row;
+  Insert: Pick<Row, Required> & Partial<Omit<Row, Required>>;
+  Update: Partial<Row>;
+  Relationships: Relationships;
+};
+export type Favorite = {
+  user_id: string;
+  property_id: string;
+  created_at: string;
+};
+export type LeadProperty = { lead_id: string; property_id: string };
+export type RateLimit = { key: string; window_start: string; hits: number };
 export type Database = {
   public: {
     Tables: {
-      profiles: Table<Profile>;
-      properties: Table<Property>;
-      leads: Table<Lead>;
-      inquiries: Table<Inquiry>;
-      conversations: Table<Conversation>;
-      messages: Table<Message>;
-      notes: Table<Note>;
-      tasks: Table<Task>;
-      settings: Table<Setting>;
-      activity_logs: Table<Activity>;
-      favorites: Table<{
-        user_id: string;
-        property_id: string;
-        created_at: string;
-      }>;
-      lead_properties: Table<{ lead_id: string; property_id: string }>;
-      rate_limits: Table<{ key: string; window_start: string; hits: number }>;
+      profiles: Table<Profile, "id">;
+      properties: Table<
+        Property,
+        "slug" | "address" | "location" | "neighborhood" | "price",
+        [Relation<"properties_assigned_to_fkey", "assigned_to", "profiles">]
+      >;
+      leads: Table<
+        Lead,
+        "full_name" | "email" | "consent_at" | "consent_text",
+        [Relation<"leads_assigned_to_fkey", "assigned_to", "profiles">]
+      >;
+      inquiries: Table<
+        Inquiry,
+        "lead_id" | "kind" | "request_id",
+        [
+          Relation<"inquiries_lead_id_fkey", "lead_id", "leads">,
+          Relation<"inquiries_property_id_fkey", "property_id", "properties">,
+          Relation<"inquiries_assigned_to_fkey", "assigned_to", "profiles">,
+        ]
+      >;
+      conversations: Table<
+        Conversation,
+        "visitor_hash",
+        [
+          Relation<"conversations_lead_id_fkey", "lead_id", "leads">,
+          Relation<
+            "conversations_property_id_fkey",
+            "property_id",
+            "properties"
+          >,
+          Relation<"conversations_assigned_to_fkey", "assigned_to", "profiles">,
+        ]
+      >;
+      messages: Table<
+        Message,
+        "conversation_id" | "sender" | "body",
+        [
+          Relation<
+            "messages_conversation_id_fkey",
+            "conversation_id",
+            "conversations"
+          >,
+          Relation<"messages_author_id_fkey", "author_id", "profiles">,
+        ]
+      >;
+      notes: Table<
+        Note,
+        "body",
+        [
+          Relation<"notes_lead_id_fkey", "lead_id", "leads">,
+          Relation<
+            "notes_conversation_id_fkey",
+            "conversation_id",
+            "conversations"
+          >,
+          Relation<"notes_author_id_fkey", "author_id", "profiles">,
+        ]
+      >;
+      tasks: Table<
+        Task,
+        "lead_id" | "title" | "due_at",
+        [
+          Relation<"tasks_lead_id_fkey", "lead_id", "leads">,
+          Relation<"tasks_assigned_to_fkey", "assigned_to", "profiles">,
+        ]
+      >;
+      settings: Table<Setting, "key" | "value">;
+      activity_logs: {
+        Row: Activity;
+        Insert: Omit<
+          Table<Activity, "action" | "entity_type" | "entity_id">["Insert"],
+          "id"
+        > & { id?: never };
+        Update: Omit<Partial<Activity>, "id"> & { id?: never };
+        Relationships: [
+          Relation<"activity_logs_actor_id_fkey", "actor_id", "profiles">,
+        ];
+      };
+      favorites: Table<
+        Favorite,
+        "user_id" | "property_id",
+        [Relation<"favorites_property_id_fkey", "property_id", "properties">]
+      >;
+      lead_properties: Table<
+        LeadProperty,
+        "lead_id" | "property_id",
+        [
+          Relation<"lead_properties_lead_id_fkey", "lead_id", "leads">,
+          Relation<
+            "lead_properties_property_id_fkey",
+            "property_id",
+            "properties"
+          >,
+        ]
+      >;
+      rate_limits: Table<RateLimit, "key">;
     };
     Views: Record<string, never>;
     Functions: {
@@ -175,3 +279,12 @@ export type Database = {
     CompositeTypes: Record<string, never>;
   };
 };
+
+export type Tables<Name extends keyof Database["public"]["Tables"]> =
+  Database["public"]["Tables"][Name]["Row"];
+export type TablesInsert<Name extends keyof Database["public"]["Tables"]> =
+  Database["public"]["Tables"][Name]["Insert"];
+export type TablesUpdate<Name extends keyof Database["public"]["Tables"]> =
+  Database["public"]["Tables"][Name]["Update"];
+export type Enums<Name extends keyof Database["public"]["Enums"]> =
+  Database["public"]["Enums"][Name];

@@ -1,16 +1,25 @@
 # Executed verification
 
-Executed October 26, 2026 in the provided workspace. No external Supabase or Gemini credentials were configured.
+Latest foundation verification: October 27, 2026, following the initial implementation checks on October 26. No external Supabase or Gemini credentials were configured.
 
 | Check | Result |
 | --- | --- |
 | `npm run typecheck` | Passed |
 | `npm run lint` | Passed; no warnings or errors |
 | `npm run build` | Passed, using Next.js's supported webpack compiler |
-| `npm run test` | 31 unit tests passed across two files |
-| `npm run test:db` | All four migrations applied to fresh PostgreSQL 17; 31 database/security assertions passed |
+| `npm run test` | 51 unit tests passed across four files; compile-time insert/identity contracts passed with TypeScript |
+| `npm run test:db` | All five migrations applied to fresh PostgreSQL 17; 42 database/security assertions passed with deliberately broad PUBLIC/API defaults |
 | Playwright desktop and mobile | 22 tests passed, using the actual production server |
+| `npm run verify:prototype` | 10 original source files and 10 illustration assets matched their SHA-256 manifest |
 | Browser bundle secret-name scan | No service-role key or Gemini API key variable references found in `.next/static` |
+
+## Foundation verification details
+
+The follow-up adds tests for paired/blank/invalid Supabase configuration, canonical origins, explicit OAuth flags, abuse-protection secrets and secret-safe errors. SSR tests mock only the SDK boundary and verify claims calls, per-request client creation, incoming/outgoing cookie updates, preservation across multiple writes, and Cache-Control/Expires/Pragma forwarding. These are unit tests, not claims of live authentication success.
+
+PostgreSQL tests additionally verify existing-user visitor provisioning, API-role TRUNCATE/TRIGGER/REFERENCES denial on every app table, protected audit sequences, locked reply paths, explicit server-role access and inactive-agent denial. TypeScript contracts reject incomplete listing inserts, messages without conversations, and client-supplied audit identities.
+
+`docs/PROTOTYPE_INVENTORY.md` records every source file and outstanding parity behavior; `docs/ROUTE_MAP.md` maps the actual filesystem routes and permission boundaries. No public design/component files or original assets changed in this foundation update.
 
 ## Unit coverage
 

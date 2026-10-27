@@ -2,6 +2,8 @@
 
 Next.js App Router / TypeScript luxury real estate website and staff CRM, migrated from the supplied static prototype. Original source is preserved in `prototype/`; it is reference material and is not served by the application. The original forest/cream/terracotta design, Fraunces/Inter typography, vector illustrations, neighborhood explorer, team copy and client stories are retained.
 
+The file-by-file review is in `docs/PROTOTYPE_INVENTORY.md`, with known interaction/visual parity gaps listed explicitly. `docs/ROUTE_MAP.md` maps every current route to its source, authorization and database dependencies. `npm run verify:prototype` checks all archived source and illustration digests.
+
 ## Quick start
 
 Requirements: Node.js 22.12+ (Node 24 LTS recommended), npm, a Supabase project and a Gemini API key for automated chat. Package versions are pinned and `package-lock.json` is committed.
@@ -28,6 +30,8 @@ Visit http://localhost:3000; the CRM is at `/admin`. Without Supabase configurat
 | `RATE_LIMIT_SALT` | Random secret of at least 32 bytes; generate with `openssl rand -hex 32` |
 | `GOOGLE_OAUTH_ENABLED` | `true` only after configuring the Google provider in Supabase; otherwise `false` |
 
+The public Supabase URL and publishable key must be supplied together; partial or malformed configuration fails validation. The site URL must be an HTTP(S) origin without a path, query, hash or embedded credentials; a trailing slash is normalized. OAuth accepts only `true` or `false`. Non-empty rate-limit salts must have at least 32 characters and must replace example text. Missing credentials still permit a local editorial preview, but do not enable authentication or data writes.
+
 Only the URL, publishable key and site origin are public. Privileged clients and Gemini modules import `server-only`. Do not commit `.env.local`, production environment files, or database credentials.
 
 ## Database and Storage
@@ -42,7 +46,7 @@ supabase db push
 
 Alternatively, execute the SQL files in `supabase/migrations/` in filename order in the Supabase SQL Editor. Never apply `tests/database/bootstrap.sql` to a Supabase project; it is exclusively an isolated test harness.
 
-The migrations create the schema, indexes, constraints, role checks, public-capture/chat RPCs, RLS policies, immutable application audit log, aggregated reports and a public `property-images` bucket with MIME/path/size restrictions. No production listings or fake private CRM records are installed.
+Apply all five migrations, including `202610270005_foundation_permissions.sql` for explicit API grants and pre-existing account profiles. The migrations create the schema, indexes, constraints, role checks, public-capture/chat RPCs, RLS policies, immutable application audit log, aggregated reports and a public `property-images` bucket with MIME/path/size restrictions. No production listings or fake private CRM records are installed.
 
 Optional reference import: run `supabase/seed-drafts.sql` manually to import the prototype's 16 historical listings as **unpublished drafts**. Verify their addresses, prices, status, agent and copy; upload photography; then publish through the CRM. The seed is not enabled automatically and is idempotent by slug. Illustrations are always labeled as such.
 
@@ -53,14 +57,14 @@ supabase start
 # Copy local API URL, publishable/anon and service-role keys into .env.local.
 # supabase start applies migrations; after changing them use:
 supabase db reset
-supabase gen types typescript --local > lib/database.types.ts
+npm run db:types
 ```
 
-`lib/database.types.ts` is schema-aligned and checked with TypeScript. Regenerate it against the configured database after schema changes. `supabase/config.toml` disables automatic seed loading.
+`lib/database.types.ts` includes required insert fields and public FK relationship metadata, and is checked with TypeScript. Run `npm run db:types` after local migrations, or `npm run db:types -- --project-id YOUR_PROJECT_REF` for a configured hosted project. The generator preserves the application’s named domain aliases and leaves existing types unchanged if generation fails. `supabase/config.toml` disables automatic seed loading.
 
 ## Provision the first administrator
 
-1. In Supabase Dashboard → Authentication → Users, create the intended user's account with a strong password and verify/confirm its email. Account creation alone always gives the profile the `visitor` role. Do not set authorization in user-editable metadata.
+1. In Supabase Dashboard → Authentication → Users, create the intended user's account with a strong password and verify/confirm its email. Account creation alone always gives the profile the `visitor` role. Migration 005 also creates visitor profiles for Auth accounts that predate the signup trigger; verify this migration is applied if provisioning previously updated zero rows. Do not set authorization in user-editable metadata.
 2. As the database owner in the Supabase SQL Editor, run this once, replacing the email:
 
 ```sql
@@ -104,6 +108,7 @@ The CRM uses actual stored counts. Listings support publication, pricing/feature
 npm run typecheck
 npm run lint
 npm run test
+npm run verify:prototype
 npm run build
 npx playwright install chromium
 npm run test:e2e
