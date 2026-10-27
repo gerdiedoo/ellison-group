@@ -1,0 +1,856 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Ellison Group — A more considered way home (redesign concept)</title>
+<meta name="description" content="Static redesign prototype of The Ellison Group website, built from a design critique. Concept only; not the official site.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f3eee6; --paper-2:#eae3d7; --ink:#14221b; --ink-2:#2c3d34; --muted:#6a746d;
+  --brick:#a04a2f; --brick-2:#7d3822; --moss:#3d5a47; --sand:#d9ccb6; --line:rgba(20,34,27,.16);
+  --serif:'Fraunces',Georgia,'Times New Roman',serif; --sans:'Inter',system-ui,-apple-system,Segoe UI,sans-serif;
+  --gutter:clamp(20px,4vw,64px); --max:1320px;
+}
+@media (prefers-color-scheme:dark){ :root{ } }
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+img,svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--brick);outline-offset:3px;border-radius:2px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--ink);color:#fff;padding:10px 16px;z-index:200}
+.skip:focus{left:8px}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--gutter)}
+.eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:500;color:var(--brick)}
+h1,h2,h3{font-family:var(--serif);font-weight:300;letter-spacing:-.02em;line-height:1.04}
+h2{font-size:clamp(34px,5vw,68px)}
+h3{font-size:clamp(22px,2.4vw,32px);font-weight:400}
+em{font-style:italic;font-weight:300}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:15px 26px;border-radius:999px;font-weight:500;font-size:15px;border:1px solid var(--ink);transition:transform .25s,background .25s,color .25s}
+.btn:hover{transform:translateY(-2px)}
+.btn.solid{background:var(--ink);color:var(--paper)}
+.btn.solid:hover{background:var(--brick);border-color:var(--brick)}
+.btn.ghost:hover{background:var(--ink);color:var(--paper)}
+.btn.light{border-color:rgba(255,255,255,.7);color:#fff}
+.btn.light:hover{background:#fff;color:var(--ink)}
+.btn.brick{background:var(--brick);border-color:var(--brick);color:#fff}
+.btn.brick:hover{background:var(--brick-2);border-color:var(--brick-2)}
+.arrow{transition:transform .25s}.btn:hover .arrow,.link:hover .arrow{transform:translateX(4px)}
+.link{display:inline-flex;gap:8px;font-weight:500;border-bottom:1px solid currentColor;padding-bottom:2px}
+
+/* prototype banner */
+.proto{background:var(--ink);color:#d8d2c4;font-size:12.5px;text-align:center;padding:8px var(--gutter);letter-spacing:.02em}
+.proto b{color:#fff;font-weight:500}
+.proto-r{margin-left:14px;display:inline-flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.proto-r button,.proto-r a{color:#f1c3ae;text-decoration:underline;text-underline-offset:3px;background:none;border:0;font:inherit;cursor:pointer;padding:0}
+.proto-r button:hover,.proto-r a:hover{color:#fff}
+@media(max-width:760px){.proto{font-size:11.5px;padding:7px 12px;line-height:1.5}.proto-r{margin-left:0;display:flex}header.site{top:64px}}
+
+/* header */
+header.site{position:fixed;top:34px;left:0;right:0;z-index:60;transition:background .35s,box-shadow .35s,color .35s,transform .35s;color:#fff}
+header.site.solid{top:0;background:rgba(243,238,230,.94);backdrop-filter:blur(10px);color:var(--ink);box-shadow:0 1px 0 var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:76px;max-width:var(--max);margin:0 auto;padding:0 var(--gutter)}
+.logo{font-family:var(--serif);font-size:23px;letter-spacing:-.01em;display:flex;align-items:baseline;gap:8px}
+.logo small{font-family:var(--sans);font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.75}
+.nav ul{display:flex;gap:34px;list-style:none;font-size:14.5px}
+.nav ul a{position:relative;padding:6px 0}
+.nav ul a::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:0;background:currentColor;transition:width .3s}
+.nav ul a:hover::after{width:100%}
+.nav .right{display:flex;align-items:center;gap:20px;font-size:14.5px}
+.nav .right .tel{opacity:.85}
+.nav .btn{padding:10px 20px;font-size:14px;border-color:currentColor}
+header.site.solid .nav .btn{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.burger{display:none;width:44px;height:44px;align-items:center;justify-content:center}
+.burger span,.burger span::before,.burger span::after{display:block;width:22px;height:1.5px;background:currentColor;position:relative;transition:.3s}
+.burger span::before,.burger span::after{content:"";position:absolute;left:0}
+.burger span::before{top:-7px}.burger span::after{top:7px}
+.menu-open .burger span{background:transparent}.menu-open .burger span::before{top:0;transform:rotate(45deg)}.menu-open .burger span::after{top:0;transform:rotate(-45deg)}
+.drawer{position:fixed;inset:0;background:var(--ink);color:var(--paper);z-index:55;display:flex;flex-direction:column;justify-content:center;padding:0 var(--gutter);gap:6px;transform:translateY(-100%);transition:transform .5s cubic-bezier(.7,0,.2,1)}
+.menu-open .drawer{transform:none}
+.drawer a{font-family:var(--serif);font-size:clamp(34px,9vw,56px);font-weight:300;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.12)}
+.menu-open header.site{top:0;color:#fff;background:transparent;box-shadow:none}
+@media(max-width:980px){.nav ul,.nav .right .tel{display:none}.burger{display:flex}.nav .right .btn{display:none}}
+
+/* hero */
+.hero{position:relative;min-height:100vh;min-height:100svh;color:#fff;display:flex;align-items:flex-end;overflow:hidden;background:#1b2b22}
+.hero-art{position:absolute;inset:0}
+.hero-art svg{width:100%;height:100%;object-fit:cover}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,18,14,.62) 0%,rgba(10,18,14,.2) 55%,rgba(10,18,14,0) 80%),linear-gradient(180deg,rgba(10,18,14,.35) 0%,rgba(10,18,14,0) 30%,rgba(10,18,14,.7) 100%);pointer-events:none}
+.hero-in{position:relative;z-index:2;width:100%;padding-bottom:clamp(36px,6vw,72px)}
+.hero h1{font-size:clamp(46px,9.2vw,148px);max-width:14ch;margin:18px 0 26px}
+.hero h1 .l{display:block;overflow:hidden}
+.hero h1 .l>span{display:inline-block;transform:translateY(105%);animation:rise 1.1s cubic-bezier(.2,.7,.1,1) forwards}
+.hero h1 .l:nth-child(2)>span{animation-delay:.12s}.hero h1 .l:nth-child(3)>span{animation-delay:.24s}
+@keyframes rise{to{transform:none}}
+.hero .eyebrow{color:#e9b79f}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:end}
+.hero p.lede{font-size:clamp(16px,1.5vw,19px);max-width:46ch;color:rgba(255,255,255,.88);margin-bottom:30px}
+.hero .ctas{display:flex;gap:14px;flex-wrap:wrap}
+.intent{background:rgba(243,238,230,.1);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.22);border-radius:18px;padding:22px;max-width:460px;justify-self:end;width:100%}
+.seg{display:flex;background:rgba(0,0,0,.28);border-radius:999px;padding:4px;margin-bottom:18px}
+.seg button{flex:1;padding:10px;border-radius:999px;font-size:14px;font-weight:500;transition:.3s}
+.seg button[aria-selected=true]{background:var(--paper);color:var(--ink)}
+.intent label{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;opacity:.8;margin-bottom:8px}
+.intent .row{display:flex;gap:8px}
+.intent input,.intent select{flex:1;min-width:0;padding:14px 16px;border-radius:12px;border:0;background:rgba(255,255,255,.95);color:var(--ink);font:inherit;font-size:15px}
+.intent .go{background:var(--brick);color:#fff;border-radius:12px;padding:0 20px;font-weight:500}
+.intent .go:hover{background:var(--brick-2)}
+.intent small{display:block;margin-top:12px;opacity:.75;font-size:13px}
+.scrollcue{position:absolute;right:var(--gutter);top:50%;z-index:2;writing-mode:vertical-rl;font-size:11px;letter-spacing:.3em;text-transform:uppercase;opacity:.6}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr}.intent{justify-self:stretch;max-width:none}.scrollcue{display:none}}
+
+/* marquee facts */
+.facts{border-bottom:1px solid var(--line)}
+.facts .wrap{display:grid;grid-template-columns:repeat(4,1fr)}
+.fact{padding:34px 0 34px 28px;border-left:1px solid var(--line)}
+.fact:first-child{border-left:0;padding-left:0}
+.fact b{font-family:var(--serif);font-weight:300;font-size:clamp(34px,4.4vw,60px);display:block;line-height:1;letter-spacing:-.03em}
+.fact span{font-size:13px;color:var(--muted)}
+@media(max-width:760px){.facts .wrap{grid-template-columns:1fr 1fr}.fact:nth-child(3){border-left:0;padding-left:0}.fact{border-top:1px solid var(--line)}.fact:nth-child(-n+2){border-top:0}}
+
+section{padding:clamp(72px,10vw,150px) 0}
+.sec-head{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:clamp(36px,6vw,80px);flex-wrap:wrap}
+.sec-head p{max-width:42ch;color:var(--ink-2)}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(28px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.7,.1,1)}
+.rv.in{opacity:1;transform:none}
+
+/* editorial properties */
+.feature{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:center;margin-bottom:clamp(56px,9vw,130px);cursor:pointer}
+.feature .ph{position:relative;overflow:hidden;border-radius:4px}
+.feature .ph .art{transition:transform 1.2s cubic-bezier(.2,.7,.1,1)}
+.feature:hover .ph .art{transform:scale(1.04)}
+.feature.a .ph{grid-column:1/9;aspect-ratio:16/10}.feature.a .tx{grid-column:9/13}
+.feature.b .ph{grid-column:6/13;aspect-ratio:4/5;order:2}.feature.b .tx{grid-column:1/6;order:1}
+.feature.c .ph{grid-column:1/8;aspect-ratio:3/2}.feature.c .tx{grid-column:8/13}
+.tx .kicker{margin-bottom:14px}
+.tx h3{margin-bottom:14px}
+.tx p{color:var(--ink-2);margin-bottom:22px;max-width:40ch}
+.spec{display:flex;gap:22px;font-size:14px;color:var(--muted);margin-bottom:22px;flex-wrap:wrap}
+.price{font-family:var(--serif);font-size:30px;font-weight:300;margin-bottom:18px;display:block}
+@media(max-width:860px){.feature .ph,.feature .tx{grid-column:1/-1!important;order:initial!important}.feature.b .ph{aspect-ratio:4/3}}
+.art{width:100%;height:100%}
+.art svg{width:100%;height:100%}
+.tag{position:absolute;top:16px;left:16px;background:var(--paper);color:var(--ink);font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:6px 12px;border-radius:999px;font-weight:500}
+.tag.pending{background:var(--brick);color:#fff}
+.note{position:absolute;right:14px;bottom:12px;font-size:10.5px;color:rgba(255,255,255,.75);letter-spacing:.06em}
+
+/* neighbourhood explorer */
+.explore{background:var(--ink);color:var(--paper)}
+.explore .eyebrow{color:#e9b79f}
+.explore .sec-head p{color:#c9c6bb}
+.xgrid{display:grid;grid-template-columns:1.25fr .75fr;gap:clamp(24px,4vw,64px);align-items:stretch}
+.mapbox{position:relative;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:#1a2c22;overflow:hidden;min-height:440px}
+.mapbox svg{width:100%;height:100%;min-height:440px}
+.hot{cursor:pointer}
+.hot .halo{fill:var(--brick);opacity:0;transition:opacity .35s,r .35s}
+.hot .dot{fill:var(--paper);transition:fill .3s}
+.hot text{fill:var(--paper);font-family:var(--sans);font-size:13px;letter-spacing:.04em;pointer-events:none}
+.hot:hover .halo,.hot:focus-visible .halo{opacity:.35}
+.hot.on .halo{opacity:.55}.hot.on .dot{fill:#f1b79b}
+.hot:focus-visible{outline:none}.hot:focus-visible .dot{stroke:#fff;stroke-width:3}
+.maplegend{position:absolute;left:16px;bottom:12px;font-size:11px;color:#8fa296;letter-spacing:.06em}
+.panel{display:flex;flex-direction:column;justify-content:space-between;border-top:1px solid rgba(255,255,255,.2);padding-top:26px}
+.panel h3{font-size:clamp(34px,4vw,54px);margin:10px 0 14px}
+.panel p{color:#cfcdc2;margin-bottom:22px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+.chip{padding:7px 14px;border:1px solid rgba(255,255,255,.28);border-radius:999px;font-size:13px}
+.pn{font-family:var(--serif);font-size:44px;font-weight:300}
+.tabs-n{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.tabs-n button{padding:8px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.22);font-size:13px;transition:.25s}
+.tabs-n button[aria-pressed=true],.tabs-n button:hover{background:var(--paper);color:var(--ink)}
+@media(max-width:900px){.xgrid{grid-template-columns:1fr}}
+
+/* inventory */
+.filters{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:34px}
+.filters .group{display:flex;gap:6px;flex-wrap:wrap}
+.fbtn{padding:8px 15px;border:1px solid var(--line);border-radius:999px;font-size:13.5px;transition:.2s;background:transparent}
+.fbtn:hover{border-color:var(--ink)}
+.fbtn[aria-pressed=true]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.filters select{padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:transparent;font:inherit;font-size:13.5px}
+.filters .count{margin-left:auto;font-size:13.5px;color:var(--muted)}
+.check{display:flex;align-items:center;gap:8px;font-size:13.5px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:34px 24px}
+.card{cursor:pointer;display:flex;flex-direction:column;gap:12px;text-align:left}
+.card .ph{position:relative;aspect-ratio:4/3;overflow:hidden;border-radius:4px}
+.card .ph .art{transition:transform .9s cubic-bezier(.2,.7,.1,1)}
+.card:hover .ph .art,.card:focus-visible .ph .art{transform:scale(1.05)}
+.card h4{font-family:var(--serif);font-weight:400;font-size:21px;letter-spacing:-.01em;line-height:1.2}
+.card .meta{display:flex;justify-content:space-between;font-size:13.5px;color:var(--muted);gap:10px}
+.card .meta b{color:var(--ink);font-weight:500}
+.empty{padding:60px 0;text-align:center;color:var(--muted);grid-column:1/-1}
+
+/* principal */
+.person{background:var(--paper-2)}
+.pgrid{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(30px,6vw,110px);align-items:center}
+.portrait{position:relative;aspect-ratio:4/5;border-radius:4px;overflow:hidden;background:var(--moss)}
+.portrait .cap{position:absolute;left:18px;bottom:14px;color:rgba(255,255,255,.8);font-size:11px;letter-spacing:.08em}
+.person h2{margin:14px 0 24px}
+.person .big{font-family:var(--serif);font-weight:300;font-size:clamp(20px,2.2vw,28px);line-height:1.35;margin-bottom:22px;color:var(--ink-2)}
+.person p{color:var(--ink-2);margin-bottom:18px;max-width:54ch}
+.timeline{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin:34px 0;padding-top:24px;border-top:1px solid var(--line)}
+.timeline b{font-family:var(--serif);font-size:clamp(28px,3.4vw,44px);font-weight:300;display:block;line-height:1}
+.timeline span{font-size:13px;color:var(--muted)}
+.team{display:flex;gap:30px;flex-wrap:wrap;margin-top:34px;padding-top:24px;border-top:1px solid var(--line)}
+.team div{font-size:14px}.team b{display:block;font-family:var(--serif);font-weight:400;font-size:19px}.team span{color:var(--muted)}
+@media(max-width:860px){.pgrid{grid-template-columns:1fr}.portrait{aspect-ratio:4/4}}
+
+/* stories */
+.storytabs{display:flex;gap:8px;margin-bottom:34px;flex-wrap:wrap}
+.stories{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.story{border-top:1px solid var(--ink);padding-top:22px;display:flex;flex-direction:column;gap:18px}
+.story.hide{display:none}
+.story q{font-family:var(--serif);font-size:clamp(20px,2vw,26px);font-weight:300;line-height:1.3;quotes:"“" "”"}
+.story .who{font-size:13.5px;color:var(--muted);margin-top:auto}
+.story .who b{color:var(--ink);font-weight:500}
+.story .role{display:inline-block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--brick)}
+@media(max-width:900px){.stories{grid-template-columns:1fr}}
+
+/* valuation */
+.value{background:var(--moss);color:var(--paper);position:relative;overflow:hidden}
+.value .eyebrow{color:#f0c3ab}
+.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,6vw,100px);align-items:center}
+.value h2{margin:14px 0 22px}
+.value p{color:#dbe3dc;max-width:44ch;margin-bottom:22px}
+.vlist{list-style:none;display:grid;gap:10px;font-size:15px}
+.vlist li{display:flex;gap:12px}.vlist li::before{content:"";width:6px;height:6px;border-radius:50%;background:#f0c3ab;margin-top:10px;flex:none}
+.vcard{background:var(--paper);color:var(--ink);border-radius:16px;padding:clamp(22px,3vw,38px);box-shadow:0 30px 70px rgba(0,0,0,.28)}
+.dots{display:flex;gap:6px;margin-bottom:22px}
+.dots i{height:3px;flex:1;background:var(--line);border-radius:3px;transition:.4s}
+.dots i.on{background:var(--brick)}
+.vstep{display:none}.vstep.on{display:block;animation:fade .5s}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.vstep h3{font-size:26px;margin-bottom:6px}.vstep>p{color:var(--muted);font-size:14.5px;margin-bottom:20px}
+.field{display:grid;gap:6px;margin-bottom:14px}
+.field label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.field input,.field select,.field textarea{padding:14px 15px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit;color:var(--ink)}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid var(--brick);outline-offset:1px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.vnav{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:12px}
+.vnav .back{font-size:14px;color:var(--muted)}
+.fine{font-size:12px;color:var(--muted);margin-top:14px}
+.err{color:var(--brick);font-size:13px;min-height:18px}
+@media(max-width:860px){.vgrid{grid-template-columns:1fr}}
+
+/* journal & newsletter */
+.jgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.post{border-top:1px solid var(--line);padding-top:20px;display:flex;flex-direction:column;gap:12px;cursor:pointer}
+.post .k{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--brick)}
+.post h4{font-family:var(--serif);font-weight:400;font-size:24px;line-height:1.2;transition:color .2s}
+.post:hover h4{color:var(--brick)}
+.post p{color:var(--muted);font-size:14.5px}
+@media(max-width:860px){.jgrid{grid-template-columns:1fr}}
+.news{background:var(--paper-2);padding:clamp(48px,7vw,90px) 0}
+.ngrid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+.news h2{font-size:clamp(30px,4vw,52px)}
+.nform{display:flex;gap:8px}
+.nform input{flex:1;min-width:0;padding:15px 18px;border-radius:999px;border:1px solid var(--line);background:#fff;font:inherit}
+.thanks{display:none;font-family:var(--serif);font-size:24px;font-weight:300}
+@media(max-width:860px){.ngrid{grid-template-columns:1fr}.ngrid>*{min-width:0}}
+@media(max-width:520px){.nform{flex-direction:column}.nform .btn{justify-content:center}}
+
+/* closing */
+.closing{background:var(--ink);color:var(--paper);text-align:center;padding:clamp(90px,14vw,200px) 0}
+.closing h2{font-size:clamp(44px,8vw,120px);max-width:16ch;margin:0 auto 30px}
+.closing p{color:#c9c6bb;max-width:52ch;margin:0 auto 34px}
+.closing .ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+footer{background:#0d1712;color:#b5bbb3;padding:60px 0 34px;font-size:14px}
+.fgrid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:34px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.1)}
+footer h5{color:#fff;font-weight:500;font-size:12px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:14px}
+footer ul{list-style:none;display:grid;gap:8px}
+footer a:hover{color:#fff}
+.flogo{font-family:var(--serif);font-size:30px;color:#fff;font-weight:300;margin-bottom:12px;display:block}
+.legal{padding-top:24px;font-size:12px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;line-height:1.7}
+@media(max-width:860px){.fgrid{grid-template-columns:1fr 1fr}}
+
+/* dialogs */
+dialog{border:0;border-radius:16px;padding:0;background:var(--paper);color:var(--ink);width:min(980px,94vw);max-height:92vh;overflow:auto;margin:auto}
+dialog::backdrop{background:rgba(10,18,14,.62);backdrop-filter:blur(4px)}
+dialog[open]{animation:pop .4s cubic-bezier(.2,.7,.1,1)}
+@keyframes pop{from{opacity:0;transform:translateY(20px) scale(.98)}to{opacity:1;transform:none}}
+.close{position:absolute;right:14px;top:14px;width:42px;height:42px;border-radius:50%;background:var(--paper);display:grid;place-items:center;font-size:22px;z-index:3;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.dgrid{display:grid;grid-template-columns:1.1fr .9fr}
+.dgrid .ph{min-height:340px;position:relative}
+.dgrid .body{padding:clamp(24px,3vw,44px)}
+.dgrid h3{font-size:34px;margin:6px 0 8px}
+.dgrid dl{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:22px 0;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.dgrid dt{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.dgrid dd{font-family:var(--serif);font-size:24px;font-weight:300}
+.pacts{display:grid;gap:10px}.pacts .btn{justify-content:center;width:100%}.pacts-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pai{background:none;border:0;color:var(--brick);font:500 14px var(--sans);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:6px;text-align:center}.pai:hover{color:var(--brick-2)}
+#psave[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+.cform{padding:clamp(24px,4vw,48px);max-width:560px;margin:auto}
+.cform h3{font-size:34px;margin-bottom:6px}.cform>p{color:var(--muted);margin-bottom:22px}
+@media(max-width:760px){.dgrid{grid-template-columns:1fr}.dgrid .ph{min-height:240px}}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,120px);background:var(--ink);color:#fff;padding:14px 22px;border-radius:999px;font-size:14px;z-index:300;transition:transform .5s cubic-bezier(.2,.7,.1,1)}
+.toast.show{transform:translate(-50%,0)}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .rv{opacity:1;transform:none}.hero h1 .l>span{transform:none}
+}
+</style>
+<link rel="stylesheet" href="widgets.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="proto"><b>Concept redesign prototype.</b> Not the official Ellison Group website; art is illustrative. <span class="proto-r"><span id="visitorState">Visitor: not signed in</span> <button type="button" id="visitorOut" hidden>Sign out</button> <button type="button" id="demoReset">Reset demo</button> <a href="admin.html">Admin dashboard &rarr;</a></span></div>
+
+<header class="site" id="hdr">
+  <div class="nav">
+    <a class="logo" href="#top" aria-label="The Ellison Group, home">The Ellison Group <small>Little Rock</small></a>
+    <ul>
+      <li><a href="#homes">Homes</a></li>
+      <li><a href="#neighborhoods">Neighborhoods</a></li>
+      <li><a href="#kerry">Kerry &amp; Team</a></li>
+      <li><a href="#stories">Client stories</a></li>
+      <li><a href="#value">Sell with us</a></li>
+      <li><a href="#journal">Journal</a></li>
+    </ul>
+    <div class="right">
+      <a class="tel" href="tel:+15017251227">(501) 725-1227</a>
+      <button class="btn" data-open="consult">Talk with us</button>
+      <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span></button>
+    </div>
+  </div>
+</header>
+<nav class="drawer" id="drawer" aria-label="Mobile">
+  <a href="#homes">Homes</a><a href="#neighborhoods">Neighborhoods</a><a href="#kerry">Kerry &amp; Team</a><a href="#stories">Client stories</a><a href="#value">Sell with us</a><a href="#journal">Journal</a>
+</nav>
+
+<main id="main">
+<!-- HERO -->
+<div class="hero" id="top">
+  <div class="hero-art" id="heroArt" aria-hidden="true"></div>
+  <div class="scrollcue" aria-hidden="true">Scroll</div>
+  <div class="wrap hero-in">
+    <div class="hero-grid">
+      <div>
+        <span class="eyebrow">Keller Williams Realty &middot; Little Rock, Arkansas</span>
+        <h1><span class="l"><span>A more</span></span><span class="l"><span><em>considered</em></span></span><span class="l"><span>way home.</span></span></h1>
+        <p class="lede">Thirty-three years of Central Arkansas knowledge, applied one household at a time. Guidance that is local, personal and unhurried.</p>
+        <div class="ctas">
+          <a class="btn light" href="#homes">Explore homes <span class="arrow">→</span></a>
+          <a class="btn brick" href="#value">Sell with us <span class="arrow">→</span></a>
+        </div>
+      </div>
+      <form class="intent" id="intent" aria-label="Start here">
+        <div class="seg" role="tablist" aria-label="I want to">
+          <button type="button" role="tab" aria-selected="true" data-mode="buy">I'm buying</button>
+          <button type="button" role="tab" aria-selected="false" data-mode="sell">I'm selling</button>
+        </div>
+        <div id="intentBuy">
+          <label for="ib-area">Where in Little Rock?</label>
+          <div class="row">
+            <select id="ib-area">
+              <option value="all">Anywhere we work</option>
+              <option value="chenal">Chenal</option>
+              <option value="pleasant">Pleasant Valley</option>
+              <option value="downtown">Historic Downtown</option>
+              <option value="beyond">Beyond Little Rock</option>
+            </select>
+            <button class="go" type="submit">Show homes</button>
+          </div>
+          <small>Tip: or <a href="#neighborhoods" class="link" style="border:0;text-decoration:underline">wander the map</a> to find your fit.</small>
+        </div>
+        <div id="intentSell" hidden>
+          <label for="is-addr">Your home's address</label>
+          <div class="row">
+            <input id="is-addr" placeholder="Street address" autocomplete="street-address">
+            <button class="go" type="submit">Begin</button>
+          </div>
+          <small>A real person prepares your valuation. No automated guesses.</small>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="facts">
+  <div class="wrap">
+    <div class="fact"><b data-count="33">33</b><span>Years in real estate</span></div>
+    <div class="fact"><b data-count="1131">1,131</b><span>Closed transactions</span></div>
+    <div class="fact"><b>1994</b><span>Kerry licensed</span></div>
+    <div class="fact"><b>$450K</b><span>Average price</span></div>
+  </div>
+</div>
+
+<!-- HOMES: editorial -->
+<section id="homes">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div><span class="eyebrow">Selected homes</span><h2 style="margin-top:14px">Three to <em>linger</em> over</h2></div>
+      <p>A short, considered selection from our current listings. The full inventory follows below, searchable and filterable.</p>
+    </div>
+    <div id="features"></div>
+  </div>
+</section>
+
+<!-- NEIGHBORHOODS: signature interaction -->
+<section class="explore" id="neighborhoods">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div><span class="eyebrow">Neighborhood discovery</span><h2 style="margin-top:14px">Find the place, <em>then</em> the house</h2></div>
+      <p>Choose a neighborhood on the map. The story opens, and the home list below filters to match.</p>
+    </div>
+    <div class="xgrid rv">
+      <div class="mapbox" id="mapbox"></div>
+      <div class="panel" aria-live="polite">
+        <div>
+          <span class="eyebrow" id="pk">Choose a place</span>
+          <h3 id="pt">Little Rock</h3>
+          <p id="pd">Six neighborhoods, one team that knows them. Select one on the map to see what makes it different.</p>
+          <div class="chips" id="pc"></div>
+        </div>
+        <div>
+          <div class="pn" id="pn">16 homes</div>
+          <div style="font-size:14px;color:#aab3ac">in our current selection</div>
+          <div class="tabs-n">
+            <a class="btn light" id="pgo" href="#inventory">See these homes <span class="arrow">→</span></a>
+            <button class="btn light" id="preset" type="button" style="display:none">Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INVENTORY -->
+<section id="inventory" style="padding-top:clamp(72px,9vw,130px)">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div><span class="eyebrow">All current listings</span><h2 style="margin-top:14px">The full <em>collection</em></h2></div>
+      <p>Search stays one click away. Filter by place, bedrooms and price.</p>
+    </div>
+    <div class="filters" role="group" aria-label="Filter homes">
+      <div class="group" id="areaBtns"></div>
+      <select id="fBeds" aria-label="Bedrooms"><option value="0">Any beds</option><option value="3">3+ beds</option><option value="4">4+ beds</option><option value="5">5+ beds</option></select>
+      <select id="fPrice" aria-label="Maximum price"><option value="0">Any price</option><option value="300000">Up to $300K</option><option value="500000">Up to $500K</option><option value="750000">Up to $750K</option><option value="1000000">Up to $1M</option></select>
+      <select id="fSort" aria-label="Sort"><option value="hi">Price, high to low</option><option value="lo">Price, low to high</option></select>
+      <label class="check"><input type="checkbox" id="fAvail"> Available only</label>
+      <span class="count" id="count" aria-live="polite"></span>
+    </div>
+    <div class="cards" id="cards"></div>
+  </div>
+</section>
+
+<!-- KERRY -->
+<section class="person" id="kerry">
+  <div class="wrap pgrid">
+    <div class="portrait rv" id="portrait" role="img" aria-label="Portrait placeholder illustration"><div class="cap">Portrait placeholder · to be replaced with an environmental portrait</div></div>
+    <div class="rv">
+      <span class="eyebrow">Principal Broker</span>
+      <h2>Kerry <em>Ellison</em></h2>
+      <p class="big">Licensed since 1994. She has guided clients through changing markets, economic cycles and life transitions with steady expertise.</p>
+      <p>Kerry is an owner in her Keller Williams Market Center and has served on its Agent Leadership Council for most of her time with the company. Her approach is simple: slow the process down enough that every decision feels like yours.</p>
+      <div class="timeline">
+        <div><b>1994</b><span>Licensed</span></div>
+        <div><b>33+</b><span>Years of experience</span></div>
+        <div><b>1,131</b><span>Closed transactions</span></div>
+      </div>
+      <button class="btn solid" data-open="consult">Schedule a consultation <span class="arrow">→</span></button>
+      <div class="team">
+        <div><b>Angela Stowell</b><span>Executive Broker | Agent</span></div>
+        <div><b>James Kirk</b><span>REALTOR®</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STORIES -->
+<section id="stories">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div><span class="eyebrow">Client stories</span><h2 style="margin-top:14px">In their <em>own words</em></h2></div>
+      <p>A few of many. Each is shown as written by the client.</p>
+    </div>
+    <div class="storytabs" role="group" aria-label="Filter stories">
+      <button class="fbtn" aria-pressed="true" data-s="all">All</button>
+      <button class="fbtn" aria-pressed="false" data-s="buying">Buying</button>
+      <button class="fbtn" aria-pressed="false" data-s="selling">Selling</button>
+    </div>
+    <div class="stories" id="stories-grid"></div>
+    <div style="margin-top:36px"><button class="link" id="moreStories">Read more stories <span class="arrow">→</span></button></div>
+  </div>
+</section>
+
+<!-- VALUATION -->
+<section class="value" id="value">
+  <div class="wrap vgrid">
+    <div class="rv">
+      <span class="eyebrow">For sellers</span>
+      <h2>What is your home <em>really</em> worth?</h2>
+      <p>Automated estimates are a starting point at best. Tell us about your home and Kerry's team will prepare a considered valuation by hand.</p>
+      <ul class="vlist">
+        <li>Reviewed personally by an experienced agent</li>
+        <li>Reply within one business day</li>
+        <li>No obligation, no pressure</li>
+      </ul>
+    </div>
+    <div class="vcard rv">
+      <div class="dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+      <form id="vform" novalidate>
+        <div class="vstep on" data-step="1">
+          <h3>Where is the home?</h3><p>Step 1 of 3</p>
+          <div class="field"><label for="v-addr">Property address</label><input id="v-addr" placeholder="e.g. 123 Main Street, Little Rock" autocomplete="street-address"></div>
+          <div class="err" id="e1"></div>
+          <div class="vnav"><span></span><button type="button" class="btn solid" data-next="2">Continue <span class="arrow">→</span></button></div>
+        </div>
+        <div class="vstep" data-step="2">
+          <h3>A little about it</h3><p>Step 2 of 3 · Helps us prepare properly</p>
+          <div class="two">
+            <div class="field"><label for="v-beds">Bedrooms</label><select id="v-beds"><option>1–2</option><option selected>3</option><option>4</option><option>5+</option></select></div>
+            <div class="field"><label for="v-time">Planning to sell</label><select id="v-time"><option>Within 3 months</option><option>3–6 months</option><option>Just exploring</option></select></div>
+          </div>
+          <div class="field"><label for="v-note">Anything we should know? <span style="text-transform:none;letter-spacing:0">(optional)</span></label><textarea id="v-note" rows="3" placeholder="Recent updates, special features, questions"></textarea></div>
+          <div class="vnav"><button type="button" class="back" data-next="1">← Back</button><button type="button" class="btn solid" data-next="3">Continue <span class="arrow">→</span></button></div>
+        </div>
+        <div class="vstep" data-step="3">
+          <h3>How do we reach you?</h3><p>Step 3 of 3</p>
+          <div class="field"><label for="v-name">Full name</label><input id="v-name" autocomplete="name"></div>
+          <div class="two">
+            <div class="field"><label for="v-email">Email</label><input id="v-email" type="email" autocomplete="email"></div>
+            <div class="field"><label for="v-phone">Phone</label><input id="v-phone" type="tel" autocomplete="tel"></div>
+          </div>
+          <div class="err" id="e3"></div>
+          <div class="vnav"><button type="button" class="back" data-next="2">← Back</button><button type="submit" class="btn brick">Request my valuation</button></div>
+          <p class="fine">By submitting you agree to be contacted by The Ellison Group about your request. Prototype: nothing is sent.</p>
+        </div>
+        <div class="vstep" data-step="4">
+          <h3>Thank you<span id="vn"></span>.</h3>
+          <p>Your request for <b id="va">your home</b> is in. In the live version, a member of the team would reply within one business day with a personal valuation. Prefer to talk now? Call <a class="link" href="tel:+15017251227">(501) 725-1227</a>.</p>
+          <div class="vnav"><button type="button" class="back" id="vreset">Start over</button><button type="button" class="btn ghost" data-open="consult">Talk with us</button></div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- JOURNAL -->
+<section id="journal">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div><span class="eyebrow">Journal</span><h2 style="margin-top:14px">Little Rock, <em>noted</em></h2></div>
+      <p>Local insight, season by season.</p>
+    </div>
+    <div class="jgrid">
+      <article class="post rv" tabindex="0"><span class="k">Around town</span><h4>The Farmers Market closes for the season Oct. 31, then moves indoors</h4><p>What changes for the 8 a.m. Saturday regulars.</p><span class="link" style="align-self:flex-start">Read <span class="arrow">→</span></span></article>
+      <article class="post rv" tabindex="0"><span class="k">Family</span><h4>Halloween at the Little Rock Zoo is two events, with an hour between them</h4><p>How to plan an evening around both.</p><span class="link" style="align-self:flex-start">Read <span class="arrow">→</span></span></article>
+      <article class="post rv" tabindex="0"><span class="k">Outdoors</span><h4>The ribbon gets cut at Pinnacle, but Highway 10 trailheads opened first</h4><p>Where riders got onto Southlake ahead of the ceremony.</p><span class="link" style="align-self:flex-start">Read <span class="arrow">→</span></span></article>
+    </div>
+  </div>
+</section>
+
+<div class="news">
+  <div class="wrap ngrid">
+    <div><span class="eyebrow">Monthly</span><h2 style="margin-top:10px">The Market <em>Review</em></h2><p style="color:var(--ink-2);margin-top:10px;max-width:44ch">Little Rock trends and updates, delivered once a month.</p></div>
+    <div>
+      <form class="nform" id="nform"><label for="nemail" class="sr" style="position:absolute;left:-999px">Email</label><input id="nemail" type="email" placeholder="Your email" required><button class="btn solid" type="submit">Subscribe</button></form>
+      <p class="thanks" id="nthanks">Thank you. You're on the list.</p>
+    </div>
+  </div>
+</div>
+
+<div class="closing">
+  <div class="wrap">
+    <span class="eyebrow" style="color:#e9b79f">Your journey starts here</span>
+    <h2 style="margin-top:18px">Let's find <em>your</em> place.</h2>
+    <p>Market expertise, steady negotiation and a client-first approach. Whether you're buying or selling in the Little Rock area, we'll guide you with clarity.</p>
+    <div class="ctas"><button class="btn brick" data-open="consult">Talk with us <span class="arrow">→</span></button><a class="btn light" href="tel:+15017251227">(501) 725-1227</a></div>
+  </div>
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div><span class="flogo">The Ellison Group</span><p>12814 Cantrell Rd<br>Little Rock, AR 72223</p><p style="margin-top:10px">(501) 725-1227</p></div>
+      <div><h5>Explore</h5><ul><li><a href="#homes">Selected homes</a></li><li><a href="#inventory">All listings</a></li><li><a href="#neighborhoods">Neighborhoods</a></li><li><a href="#journal">Journal</a></li></ul></div>
+      <div><h5>Work with us</h5><ul><li><a href="#kerry">Kerry &amp; team</a></li><li><a href="#stories">Client stories</a></li><li><a href="#value">Home valuation</a></li></ul></div>
+      <div><h5>Follow</h5><ul><li><a href="https://www.instagram.com/theellisongroup">Instagram</a></li><li><a href="https://www.facebook.com/TheEllisonGroupatKellerWilliamsRealty/">Facebook</a></li><li><a href="https://www.linkedin.com/company/theellisongroup/">LinkedIn</a></li><li><a href="https://www.youtube.com/@kerryellison5635">YouTube</a></li></ul></div>
+    </div>
+    <div class="legal"><span>Keller Williams Realty and The Ellison Group. Each office is independently owned and operated. REALTOR® · Equal Housing Opportunity.</span><span>Concept redesign prototype for design review. Listing and testimonial content sourced from the current public site.</span></div>
+  </div>
+</footer>
+
+<!-- Property dialog -->
+<dialog id="pdlg" aria-label="Property details">
+  <button class="close" data-close aria-label="Close">×</button>
+  <div class="dgrid"><div class="ph" id="pph"></div>
+    <div class="body">
+      <span class="eyebrow" id="pstat"></span>
+      <h3 id="paddr"></h3><div id="ploc" style="color:var(--muted)"></div>
+      <dl><div><dt>Price</dt><dd id="pprice"></dd></div><div><dt>Beds / Baths</dt><dd id="pbb"></dd></div><div><dt>Sq. Ft.</dt><dd id="psf"></dd></div></dl>
+      <p id="pnote" style="color:var(--ink-2);margin-bottom:22px"></p>
+      <div class="pacts" role="group" aria-label="Property actions">
+        <button class="btn solid" id="pshow" type="button">Request a showing <span class="arrow">→</span></button>
+        <button class="btn ghost" id="pask" type="button">Ask about this property</button>
+        <div class="pacts-row"><button class="btn ghost" id="psave" type="button" aria-pressed="false">&#9825; Save property</button><button class="btn ghost" id="pagent" type="button">Contact the agent</button></div>
+        <button class="pai" id="pai" type="button">Start a conversation with the AI assistant (simulated)</button>
+      </div>
+    </div></div>
+</dialog>
+
+<!-- Consult dialog -->
+<dialog id="consult" aria-label="Talk with us">
+  <button class="close" data-close aria-label="Close">×</button>
+  <form class="cform" id="cform" novalidate>
+    <div id="cf-main">
+      <span class="eyebrow">Talk with us</span>
+      <h3 style="margin-top:8px">How can we help?</h3><p>A short note is plenty. Someone from the team will reply personally.</p>
+      <div class="field"><label for="c-int">Interested in</label><select id="c-int"><option>Buying</option><option>Selling</option><option>Selling &amp; buying</option><option>Renting</option><option>Something else</option></select></div>
+      <div class="field"><label for="c-name">Name</label><input id="c-name" autocomplete="name"></div>
+      <div class="two"><div class="field"><label for="c-email">Email</label><input id="c-email" type="email" autocomplete="email"></div><div class="field"><label for="c-phone">Phone</label><input id="c-phone" type="tel" autocomplete="tel"></div></div>
+      <div class="field"><label for="c-msg">Message</label><textarea id="c-msg" rows="3"></textarea></div>
+      <div class="err" id="ce"></div>
+      <button class="btn solid" type="submit">Send message</button>
+      <p class="fine">Prototype: nothing is sent.</p>
+    </div>
+    <div id="cf-done" hidden><h3>Message received.</h3><p style="margin-top:10px">Thank you. In the live site, we would be in touch shortly.</p><button type="button" class="btn ghost" data-close style="margin-top:18px">Close</button></div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="store.js"></script>
+<script src="widgets.js"></script>
+<script src="chat.js"></script>
+<script>
+/* ---------- data ---------- */
+const L=EG.PROPS;
+const AREAS=EG.AREAS;
+const STORIES=[
+ {r:'buying',q:'James Kirk was wonderful! I enjoyed working with him. He was patient, honest, and kind.',w:'Cindy U.',c:'Buying · worked with James Kirk'},
+ {r:'selling',q:'They show up as true professionals with great ideas to help you get your home sold in less time, for more money, and less hassles.',w:'Dennis R.',c:'Selling'},
+ {r:'buying',q:'The Kerry Ellison Team was more than helpful throughout the process of purchasing my home.',w:'Steve F.',c:'Buying'},
+ {r:'selling',q:'Kerry and Angie are phenomenal to work with. They are always available to answer any questions.',w:'Sean U.',c:'Buying & selling'},
+ {r:'buying',q:'We loved working with The Ellison Group. The whole team was so helpful and knowledgable.',w:'Geoffrey A.',c:'Buying'},
+ {r:'selling',q:'My wife and I have a great relationship with Kerry and team and we are always confident they will provide value.',w:'Scott B.',c:'Repeat clients'},
+ {r:'buying',q:'5 stars and would give more if I could. Highly recommend. Extremely knowledgeable and professional!',w:'Kevin A.',c:'Client'},
+ {r:'selling',q:'The Ellison Group has consistently demonstrated an exceptional level of care and dedication to meeting all of our needs.',w:'Pam H.',c:'Client'},
+ {r:'buying',q:'The Ellison Group provided my family with exceptional realtor service. They really went above and beyond.',w:'Matt N.',c:'Buying'}
+];
+
+/* ---------- helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const money=n=>'$'+n.toLocaleString('en-US');
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600)};
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- illustrated placeholder art ---------- */
+const PAL=[['#e9d6bd','#c98f6b','#5d7d63'],['#d7e0dc','#9db3a6','#3e5a49'],['#efd9c3','#d4a37c','#6c7f5a'],['#dfd4c5','#b98b72','#4b6554'],['#e5dccb','#a9a58b','#35503f']];
+function art(type,seed=0){
+ const [sky,wall,tree]=PAL[seed%PAL.length];
+ const roof='#3a2d28', door='#2b3a31';
+ let h='';
+ const win=(x,y,w=26,hh=34)=>`<rect x="${x}" y="${y}" width="${w}" height="${hh}" fill="#25352c" opacity=".85"/><rect x="${x+w/2-.7}" y="${y}" width="1.4" height="${hh}" fill="${wall}"/>`;
+ if(type==='lot'){
+   h=`<rect y="320" width="800" height="180" fill="${tree}"/>`+[80,190,300,430,560,690].map((x,i)=>`<g><rect x="${x}" y="${190+i%2*30}" width="8" height="${150-i%2*30}" fill="#2a2420"/><ellipse cx="${x+4}" cy="${190+i%2*30}" rx="${38+i%3*8}" ry="${70+i%2*10}" fill="${i%2?'#2f4a3a':'#3a5a46'}"/></g>`).join('')+`<path d="M0 420 Q400 380 800 430 L800 500 L0 500Z" fill="#8c8576"/>`;
+ }else if(type==='tower'){
+   h=`<rect y="400" width="800" height="100" fill="${tree}"/><rect x="270" y="70" width="260" height="340" fill="${wall}"/>`+Array.from({length:40},(_,i)=>`<rect x="${285+(i%8)*30}" y="${90+Math.floor(i/8)*62}" width="20" height="40" fill="#25352c" opacity=".8"/>`).join('')+`<rect x="530" y="250" width="120" height="160" fill="#9a8a7a"/><rect x="530" y="250" width="120" height="8" fill="${roof}"/>`;
+ }else{
+   h=`<rect y="380" width="800" height="120" fill="${tree}"/>`;
+   h+=[60,700,745].map((x,i)=>`<g><rect x="${x}" y="${250+i*10}" width="9" height="140" fill="#2a2420"/><ellipse cx="${x+4}" cy="${250+i*10}" rx="${50-i*6}" ry="${90-i*8}" fill="#2f4a3a"/></g>`).join('');
+   if(type==='ranch'){h+=`<rect x="170" y="260" width="460" height="130" fill="${wall}"/><polygon points="150,262 400,190 650,262" fill="${roof}"/><rect x="540" y="200" width="22" height="50" fill="#6b4a3a"/>`+win(220,300)+win(300,300)+win(500,300)+`<rect x="385" y="310" width="34" height="80" fill="${door}"/>`}
+   else if(type==='porch'){h+=`<rect x="190" y="230" width="420" height="160" fill="${wall}"/><polygon points="170,232 400,140 630,232" fill="${roof}"/><rect x="240" y="320" width="320" height="10" fill="#e8dfd0"/>`+[250,320,420,500,545].map(x=>`<rect x="${x}" y="300" width="9" height="90" fill="#f0e8da"/>`).join('')+win(230,255)+win(500,255)+`<rect x="383" y="330" width="34" height="60" fill="${door}"/>`}
+   else if(type==='columns'){h+=`<rect x="130" y="250" width="540" height="140" fill="${wall}"/><polygon points="110,252 400,150 690,252" fill="${roof}"/><rect x="330" y="215" width="140" height="175" fill="#eee5d6"/><polygon points="320,216 400,170 480,216" fill="#eee5d6"/>`+[340,370,430,455].map(x=>`<rect x="${x}" y="240" width="9" height="150" fill="#fff"/>`).join('')+win(170,285)+win(220,285)+win(540,285)+win(590,285)+`<rect x="383" y="320" width="34" height="70" fill="${door}"/>`}
+   else if(type==='stone'){h+=`<rect x="110" y="230" width="580" height="160" fill="#b7a791"/><polygon points="90,232 400,120 710,232" fill="${roof}"/><rect x="560" y="140" width="26" height="80" fill="#7a6a5a"/><rect x="330" y="205" width="140" height="185" fill="#a89883"/><polygon points="322,206 400,150 478,206" fill="${roof}"/>`+win(150,270)+win(200,270)+win(560,270)+win(610,270)+`<path d="M382 390 v-60 a18 18 0 0 1 36 0 v60z" fill="${door}"/>`}
+   else if(type==='stucco'){h+=`<rect x="150" y="240" width="500" height="150" fill="#cfc2ae"/><polygon points="130,242 300,150 470,242" fill="${roof}"/><polygon points="420,242 560,170 670,242" fill="${roof}"/>`+win(190,290)+win(250,290)+win(500,290)+win(560,290)+`<rect x="340" y="305" width="34" height="85" fill="${door}"/>`}
+   else {h+=`<rect x="140" y="240" width="520" height="150" fill="${wall}"/><polygon points="120,242 400,140 680,242" fill="${roof}"/><rect x="330" y="200" width="140" height="190" fill="${wall}"/><polygon points="322,202 400,150 478,202" fill="${roof}"/>`+win(180,285)+win(230,285)+win(540,285)+win(590,285)+`<path d="M384 390 v-55 a16 16 0 0 1 32 0 v55z" fill="${door}"/>`}
+   h+=`<path d="M360 500 L400 392 L440 500Z" fill="#d6cdbb" opacity=".8"/>`;
+ }
+ return `<svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="g${seed}${type}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky}"/><stop offset="1" stop-color="#f6efe3"/></linearGradient></defs><rect width="800" height="500" fill="url(#g${seed}${type})"/><circle cx="${600+seed*20}" cy="90" r="38" fill="#f6dcc0" opacity=".85"/>${h}</svg>`;
+}
+const artBox=(l)=>`<div class="art">${art(l.type,l.id)}</div>`;
+
+/* hero art */
+$('#heroArt').innerHTML=`<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="hs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#263a2f"/><stop offset=".55" stop-color="#b9705a"/><stop offset="1" stop-color="#f0c19c"/></linearGradient></defs>
+<rect width="1600" height="900" fill="url(#hs)"/><g id="hsun"><circle cx="1180" cy="470" r="120" fill="#f9dcb8" opacity=".9"/></g>
+<g id="hl1" fill="#4a5f52" opacity=".55"><path d="M0 560 Q250 470 520 540 T1060 520 T1600 540 V900 H0Z"/></g>
+<g id="hl2" fill="#33493b"><path d="M0 640 Q300 560 640 630 T1240 610 T1600 650 V900 H0Z"/></g>
+<g id="hl3"><path d="M0 740 Q400 690 800 730 T1600 720 V900 H0Z" fill="#1f3128"/>
+<g transform="translate(700 560)"><rect width="360" height="190" fill="#7d3f2b"/><polygon points="-26,0 180,-110 386,0" fill="#2a211d"/><rect x="250" y="-92" width="28" height="70" fill="#5a3426"/>
+${[24,92,230,298].map(x=>`<rect x="${x}" y="46" width="42" height="62" fill="#f0c98a" opacity=".92"/>`).join('')}<rect x="150" y="82" width="62" height="108" fill="#1c2a22"/></g>
+<g fill="#16241d"><rect x="1010" y="500" width="14" height="250"/><ellipse cx="1017" cy="500" rx="86" ry="150"/><rect x="130" y="560" width="12" height="190"/><ellipse cx="136" cy="560" rx="70" ry="120"/><rect x="1330" y="560" width="12" height="190"/><ellipse cx="1336" cy="560" rx="60" ry="110"/></g></g></svg>`;
+if(!reduce){const l1=$('#hl1'),l2=$('#hl2'),l3=$('#hl3'),sun=$('#hsun');
+ addEventListener('mousemove',e=>{const x=(e.clientX/innerWidth-.5),y=(e.clientY/innerHeight-.5);
+  sun.style.transform=`translate(${x*-10}px,${y*-6}px)`;l1.style.transform=`translate(${x*-14}px,${y*-6}px)`;l2.style.transform=`translate(${x*-26}px,${y*-9}px)`;l3.style.transform=`translate(${x*-44}px,${y*-12}px)`;});
+ [l1,l2,l3,sun].forEach(n=>n.style.transition='transform .6s ease-out');}
+
+/* portrait placeholder (abstract, not a likeness) */
+$('#portrait').insertAdjacentHTML('afterbegin',`<svg viewBox="0 0 400 500" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%"><rect width="400" height="500" fill="#3d5a47"/><circle cx="310" cy="110" r="70" fill="#c98f6b" opacity=".55"/><path d="M0 380 Q200 300 400 370 V500 H0Z" fill="#2c4636"/><circle cx="200" cy="230" r="62" fill="#e7dccb"/><path d="M80 500 Q90 340 200 320 Q310 340 320 500Z" fill="#e7dccb"/></svg>`);
+
+/* ---------- header, drawer ---------- */
+const hdr=$('#hdr');const onScroll=()=>hdr.classList.toggle('solid',scrollY>40);onScroll();addEventListener('scroll',onScroll,{passive:true});
+$('#burger').onclick=()=>{const o=document.body.classList.toggle('menu-open');$('#burger').setAttribute('aria-expanded',o)};
+$$('#drawer a').forEach(a=>a.onclick=()=>{document.body.classList.remove('menu-open');$('#burger').setAttribute('aria-expanded','false')});
+addEventListener('keydown',e=>{if(e.key==='Escape')document.body.classList.remove('menu-open')});
+
+/* ---------- hero intent ---------- */
+let mode='buy';
+$$('.seg button').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;$$('.seg button').forEach(x=>x.setAttribute('aria-selected',x===b));$('#intentBuy').hidden=mode!=='buy';$('#intentSell').hidden=mode!=='sell'});
+$('#intent').addEventListener('submit',e=>{e.preventDefault();
+ if(mode==='buy'){setArea($('#ib-area').value);document.getElementById('inventory').scrollIntoView({behavior:reduce?'auto':'smooth'})}
+ else{const a=$('#is-addr').value.trim();if(a)$('#v-addr').value=a;document.getElementById('value').scrollIntoView({behavior:reduce?'auto':'smooth'});if(a)goStep(2)}
+});
+
+/* ---------- featured ---------- */
+const FEAT=[
+ {l:L[0],cls:'a',kick:'A closer look at Chenal',txt:'Five bedrooms and five baths across nearly 6,800 square feet, set in the established, tree-shaded landscape of West Little Rock.'},
+ {l:L[1],cls:'b',kick:'Pleasant Valley',txt:'Three bedrooms and a generous 3,550 square feet, tucked on a quiet court in the 72212 area.'},
+ {l:L[5],cls:'c',kick:'Historic Downtown',txt:'A five-bedroom home with a porch made for evenings, and 4,583 square feet inside.'}
+];
+$('#features').innerHTML=FEAT.map(f=>`<article class="feature ${f.cls} rv" data-id="${f.l.id}" tabindex="0" role="button" aria-label="View ${f.l.addr}">
+ <div class="ph">${artBox(f.l)}<span class="tag">${f.l.st}</span><span class="note">Placeholder art</span></div>
+ <div class="tx"><span class="eyebrow kicker">${f.kick}</span><h3>${f.l.addr}</h3><div class="spec"><span>${f.l.bd} beds</span><span>${f.l.ba} baths</span><span>${f.l.sf.toLocaleString()} sq ft</span></div><p>${f.txt}</p><span class="price">${money(f.l.p)}</span><span class="link">View the home <span class="arrow">→</span></span></div></article>`).join('');
+$$('.feature').forEach(n=>{const o=()=>openProp(+n.dataset.id);n.onclick=o;n.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();o()}}});
+
+/* ---------- inventory ---------- */
+let areaF='all';
+const AREANAMES={all:'All areas',chenal:'Chenal',pleasant:'Pleasant Valley',downtown:'Downtown',beyond:'Beyond Little Rock'};
+$('#areaBtns').innerHTML=Object.entries(AREANAMES).map(([k,v])=>`<button class="fbtn" data-a="${k}" aria-pressed="${k==='all'}">${v}</button>`).join('');
+function render(){
+ const beds=+$('#fBeds').value,mx=+$('#fPrice').value,av=$('#fAvail').checked,so=$('#fSort').value;
+ let r=L.filter(l=>(areaF==='all'||l.area===areaF)&&l.bd>=beds&&(!mx||l.p<=mx)&&(!av||l.st==='For Sale'));
+ r.sort((a,b)=>so==='hi'?b.p-a.p:a.p-b.p);
+ $('#cards').innerHTML=r.length?r.map(l=>`<button class="card" data-id="${l.id}" aria-label="${l.addr}, ${money(l.p)}"><div class="ph">${artBox(l)}<span class="tag ${l.st==='Pending'?'pending':''}">${l.st}</span></div><h4>${l.addr}</h4><div class="meta"><span>${l.bd?`${l.bd} bd · ${l.ba} ba · ${l.sf.toLocaleString()} sf`:'Vacant lot'}</span><b>${money(l.p)}</b></div><div class="meta"><span>${l.loc}</span></div></button>`).join(''):`<div class="empty">No homes match these filters. Try widening your search.</div>`;
+ $('#count').textContent=`${r.length} home${r.length===1?'':'s'}`;
+ $$('#areaBtns .fbtn').forEach(b=>b.setAttribute('aria-pressed',b.dataset.a===areaF));
+ $$('.card').forEach(c=>c.onclick=()=>openProp(+c.dataset.id));
+ updatePanelCount();
+}
+function setArea(a){areaF=a;render();syncMap()}
+$('#areaBtns').onclick=e=>{const b=e.target.closest('[data-a]');if(b)setArea(b.dataset.a)};
+['#fBeds','#fPrice','#fSort','#fAvail'].forEach(s=>$(s).onchange=render);
+
+/* ---------- property dialog ---------- */
+let curProp=null;
+function savedHas(id){const l=EG.sessionLead();return !!(l&&(l.savedPropertyIds||[]).includes(id))}
+function syncSave(){const b=$('#psave');if(!b||!curProp)return;const on=savedHas(curProp.id);b.setAttribute('aria-pressed',on);b.innerHTML=on?'&#9829; Saved':'&#9825; Save property'}
+function openProp(id){const l=L.find(x=>x.id===id);curProp=l;EG.ui.focusPropertyId=id;
+ $('#pph').innerHTML=`<div style="position:absolute;inset:0">${artBox(l)}</div><span class="tag ${l.st==='Pending'?'pending':''}">${l.st}</span>`;
+ $('#pstat').textContent=l.st;$('#paddr').textContent=l.addr;$('#ploc').textContent=l.loc;
+ $('#pprice').textContent=money(l.p);$('#pbb').textContent=l.bd?`${l.bd} / ${l.ba}`:'—';$('#psf').textContent=l.sf?l.sf.toLocaleString():'—';
+ $('#pnote').textContent=l.st==='Pending'?'This home is under contract. Tell us what you are looking for and we will watch for something similar.':'Interested? We can arrange a private showing, or answer questions before you visit.';
+ $('#pshow').innerHTML=(l.st==='Pending'?'Find me something similar':'Request a showing')+' <span class="arrow">→</span>';
+ const gate=(action,type)=>()=>EG.ui.ensureLead(action,l.id,lead=>{$('#pdlg').close();EG.ui.openInquiry({type,propertyId:l.id,lead})});
+ $('#pshow').onclick=gate('showing','Showing request');
+ $('#pask').onclick=gate('ask','Property question');
+ $('#pagent').onclick=gate('contact','Contact agent');
+ $('#psave').onclick=()=>EG.ui.ensureLead('save',l.id,lead=>{if(!lead){EG.ui.toast('Saving needs a visitor profile. Enable lead capture to try it.');return}const on=EG.saveProperty(lead.id,l.id);syncSave();EG.ui.toast(on?'Saved to your list (prototype).':'Removed from your saved list.')});
+ $('#pai').onclick=()=>EG.ui.ensureLead('assistant',l.id,()=>{$('#pdlg').close();EG.ui.chat&&EG.ui.chat.askAbout(l.id)});
+ syncSave();$('#pdlg').showModal();}
+EG.ui.openProperty=openProp;
+function openDlg(d){$('#cf-main').hidden=false;$('#cf-done').hidden=true;d.showModal()}
+$$('[data-open=consult]').forEach(b=>b.onclick=()=>{ $('#cf-main').hidden=false;$('#cf-done').hidden=true; $('#consult').showModal()});
+$$('dialog').forEach(d=>{d.addEventListener('click',e=>{if(e.target===d)d.close()});$$('[data-close]',d).forEach(b=>b.onclick=()=>d.close())});
+$('#cform').addEventListener('submit',e=>{e.preventDefault();
+ const n=$('#c-name').value.trim(),m=$('#c-email').value.trim(),p=$('#c-phone').value.trim();
+ if(!n||(!m&&!p)){$('#ce').textContent='Please add your name and an email or phone number.';return}
+ if(m&&!/^\S+@\S+\.\S+$/.test(m)){$('#ce').textContent='That email address looks incomplete.';return}
+ $('#ce').textContent='';
+ const intMap={'Buying':'General','Selling':'Valuation request','Selling & buying':'General','Renting':'General','Something else':'General'};
+ let em=m;if(!em){$('#ce').textContent='Please add an email address so the team can reply.';return}
+ const r=EG.captureLead({name:n,email:em,phone:p,method:'form',intent:intMap[$('#c-int').value]||'General',propertyId:curProp&&/showing|similar/.test($('#c-msg').value)?curProp.id:null});
+ EG.setSession(r.lead.id,'form');
+ EG.addInquiry({leadId:r.lead.id,propertyId:curProp&&/showing|similar/.test($('#c-msg').value)?curProp.id:null,type:/showing/i.test($('#c-msg').value)?'Showing request':'General',message:($('#c-int').value+': '+$('#c-msg').value).trim()});
+ $('#cf-main').hidden=true;$('#cf-done').hidden=false;e.target.reset();EG.ui.toast('Message recorded (prototype). Nothing was emailed.')});
+
+/* ---------- neighborhood map ---------- */
+const NODES={
+ maumelle:{x:250,y:90,r:52},hillcrest:{x:430,y:150,r:44},heights:{x:380,y:260,r:44},
+ downtown:{x:560,y:300,r:50},pleasant:{x:230,y:310,r:50},chenal:{x:110,y:380,r:50}
+};
+const mapSvg=`<svg viewBox="0 0 700 480" role="group" aria-label="Illustrative neighborhood map" xmlns="http://www.w3.org/2000/svg">
+<defs><pattern id="gr" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#fff" stroke-opacity=".05"/></pattern></defs>
+<rect width="700" height="480" fill="url(#gr)"/>
+<path d="M0 205 C120 190 170 230 260 215 C350 200 380 170 470 200 C560 232 620 210 700 190" fill="none" stroke="#5c8ea0" stroke-width="22" stroke-opacity=".5" stroke-linecap="round"/>
+<path d="M0 205 C120 190 170 230 260 215 C350 200 380 170 470 200 C560 232 620 210 700 190" fill="none" stroke="#8fc0cf" stroke-width="2" stroke-opacity=".6" stroke-dasharray="2 8"/>
+<path d="M40 460 C200 330 330 360 470 250 C560 180 640 190 700 120" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="3"/>
+<path d="M0 330 C150 340 300 300 460 330 C560 350 640 330 700 350" fill="none" stroke="#fff" stroke-opacity=".1" stroke-width="2"/>
+<text x="520" y="168" fill="#8fc0cf" font-size="11" letter-spacing="3" opacity=".8" font-family="Inter,sans-serif">ARKANSAS RIVER</text>
+${Object.entries(NODES).map(([k,n])=>`<g class="hot" data-k="${k}" tabindex="0" role="button" aria-label="${AREAS[k].n}"><circle class="halo" cx="${n.x}" cy="${n.y}" r="${n.r}"/><circle class="dot" cx="${n.x}" cy="${n.y}" r="9"/><text x="${n.x+(n.x>520?-16:16)}" y="${n.y+4}" text-anchor="${n.x>520?'end':'start'}">${AREAS[k].n}</text></g>`).join('')}
+</svg><div class="maplegend">Illustrative map, not to scale</div>`;
+$('#mapbox').innerHTML=mapSvg;
+let cur='all';
+const mapArea=k=>k==='heights'||k==='hillcrest'||k==='maumelle'?null:k;
+function selectHood(k){cur=k;const a=AREAS[k];
+ $('#pk').textContent=a.k;$('#pt').textContent=a.n;$('#pd').textContent=a.d;
+ $('#pc').innerHTML=a.c.map(c=>`<span class="chip">${c}</span>`).join('');
+ $$('.hot').forEach(h=>h.classList.toggle('on',h.dataset.k===k));
+ $('#preset').style.display=k==='all'?'none':'';
+ const m=mapArea(k);if(k==='all')setArea('all');else if(m)setArea(m);else{setArea('all');}
+ updatePanelCount();}
+function updatePanelCount(){
+ const m=mapArea(cur);let n;
+ if(cur==='all')n=L.length;else if(m)n=L.filter(l=>l.area===m).length;else n=0;
+ $('#pn').textContent=(m||cur==='all')?`${n} home${n===1?'':'s'}`:'Coming soon';
+ const sub=$('#pn').nextElementSibling;
+ sub.textContent=(m||cur==='all')?'in our current selection':'No current listings here in this prototype. Ask us about upcoming homes.';
+}
+function syncMap(){const hit=Object.keys(NODES).find(k=>mapArea(k)===areaF);
+ if(areaF==='all'&&cur!=='all'&&mapArea(cur)){cur='all';const a=AREAS.all;$('#pk').textContent=a.k;$('#pt').textContent=a.n;$('#pd').textContent=a.d;$('#pc').innerHTML='';$$('.hot').forEach(h=>h.classList.remove('on'));$('#preset').style.display='none';}
+ else if(hit&&cur!==hit){cur=hit;const a=AREAS[hit];$('#pk').textContent=a.k;$('#pt').textContent=a.n;$('#pd').textContent=a.d;$('#pc').innerHTML=a.c.map(c=>`<span class="chip">${c}</span>`).join('');$$('.hot').forEach(h=>h.classList.toggle('on',h.dataset.k===hit));$('#preset').style.display='';}
+ updatePanelCount();}
+$('#mapbox').addEventListener('click',e=>{const h=e.target.closest('.hot');if(h)selectHood(h.dataset.k)});
+$('#mapbox').addEventListener('keydown',e=>{const h=e.target.closest('.hot');if(h&&(e.key==='Enter'||e.key===' ')){e.preventDefault();selectHood(h.dataset.k)}});
+$('#preset').onclick=()=>selectHood('all');
+$('#pgo').onclick=()=>{};
+
+/* ---------- stories ---------- */
+let sFilter='all',sAll=false;
+function renderStories(){
+ const list=STORIES.filter(s=>sFilter==='all'||s.r===sFilter);
+ const shown=sAll?list:list.slice(0,3);
+ $('#stories-grid').innerHTML=shown.map(s=>`<figure class="story"><span class="role">${s.c}</span><q>${s.q}</q><figcaption class="who"><b>${s.w}</b></figcaption></figure>`).join('');
+ const more=$('#moreStories');more.style.display=list.length>3&&!sAll?'':'none';
+}
+$$('.storytabs .fbtn').forEach(b=>b.onclick=()=>{sFilter=b.dataset.s;$$('.storytabs .fbtn').forEach(x=>x.setAttribute('aria-pressed',x===b));renderStories()});
+$('#moreStories').onclick=()=>{sAll=true;renderStories()};
+renderStories();
+
+/* ---------- valuation ---------- */
+function goStep(n){$$('.vstep').forEach(s=>s.classList.toggle('on',+s.dataset.step===n));$$('.dots i').forEach((d,i)=>d.classList.toggle('on',i<Math.min(n,3)));$('.dots').style.visibility=n===4?'hidden':'visible'}
+$$('[data-next]').forEach(b=>b.onclick=()=>{const n=+b.dataset.next;
+ if(n===2&&b.classList.contains('btn')){if(!$('#v-addr').value.trim()){$('#e1').textContent='Please enter the property address.';return}$('#e1').textContent=''}
+ goStep(n)});
+$('#vform').addEventListener('submit',e=>{e.preventDefault();
+ const n=$('#v-name').value.trim(),m=$('#v-email').value.trim(),p=$('#v-phone').value.trim();
+ if(!n||(!m&&!p)){$('#e3').textContent='Please add your name and an email or phone number.';return}
+ if(m&&!/^\S+@\S+\.\S+$/.test(m)){$('#e3').textContent='That email address looks incomplete.';return}
+ $('#e3').textContent='';
+ if(!m){$('#e3').textContent='Please add an email address so the team can reply.';return}
+ const vr=EG.captureLead({name:n,email:m,phone:p,method:'form',intent:'Valuation request'});EG.setSession(vr.lead.id,'form');
+ EG.addInquiry({leadId:vr.lead.id,propertyId:null,type:'Valuation request',message:`Valuation for ${$('#v-addr').value.trim()||'(address not given)'}. ${$('#v-beds').value} bed, planning to sell: ${$('#v-time').value}. ${$('#v-note').value.trim()}`.trim()});
+ $('#vn').textContent=', '+n.split(' ')[0];$('#va').textContent=$('#v-addr').value.trim()||'your home';goStep(4);EG.ui.toast('Valuation request recorded (prototype).')});
+$('#vreset').onclick=()=>{$('#vform').reset();goStep(1)};
+
+/* newsletter */
+$('#nform').addEventListener('submit',e=>{e.preventDefault();e.target.style.display='none';$('#nthanks').style.display='block'});
+
+/* ---------- reveal + counters ---------- */
+const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target)}}),{threshold:.12});
+$$('.rv').forEach(n=>io.observe(n));
+if(!reduce){const co=new IntersectionObserver(es=>es.forEach(en=>{if(!en.isIntersecting)return;co.unobserve(en.target);const t=+en.target.dataset.count,s=performance.now();
+ const f=n=>{const p=Math.min((n-s)/1400,1),v=Math.round(t*(1-Math.pow(1-p,3)));en.target.textContent=v.toLocaleString();if(p<1)requestAnimationFrame(f)};requestAnimationFrame(f)}),{threshold:.6});
+ $$('[data-count]').forEach(n=>co.observe(n));}
+
+render();
+/* ---------- prototype: visitor session, demo controls, assistant ---------- */
+function visitorUI(){const l=EG.sessionLead();$('#visitorState').textContent=l?`Visitor: ${l.name.split(' ')[0]} (demo session)`:'Visitor: not signed in';$('#visitorOut').hidden=!l;syncSave()}
+$('#visitorOut').onclick=()=>{EG.clearSession();EG.ui.chat&&EG.ui.chat.reset();EG.ui.toast('Signed out of the demo session.')};
+$('#demoReset').onclick=()=>{if(confirm('Reset all demo data (leads, inquiries, conversations, settings) to the starting sample?')){EG.reset();EG.ui.chat&&EG.ui.chat.reset();visitorUI();EG.ui.toast('Demo data reset.')}};
+EG.on(visitorUI);visitorUI();
+EG.ui.mountChat({onValuation:()=>{EG.ui.chat.root.classList.remove('open');document.getElementById('value').scrollIntoView({behavior:'smooth'})}});
+(function(){const m=location.hash.match(/^#property-(\d+)/);if(m&&L.find(x=>x.id===+m[1]))setTimeout(()=>openProp(+m[1]),250)})();
+</script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+{
+  "source": "repomix-output.xml",
+  "source_sha256": "5674640b8622ad6fa35ba69ce7cf3ca3f58c1e652e120c5975738d81ed941f2e",
+  "comparison": "Every prototype file matches its corresponding bundle entry, ignoring only the enclosing file-entry final newline. Archived file hashes below are byte-exact.",
+  "files": [
+    {
+      "path": "prototype/README.md",
+      "bytes": 1250,
+      "lines": 19,
+      "sha256": "6562330d7e1b06f3f1f47e09d0bf0acda7873717925844d6301815b3d622c929",
+      "matches_uploaded_entry": true
+    },
+    {
+      "path": "prototype/admin-pages.js",
+      "bytes": 28700,
+      "lines": 233,
+      "sha256": "0f97e45927358724d176e7d71ab6d4930d713ed0a2f47bb8bb259d16485d399f",
+      "matches_uploaded_entry": true
+    },
+    {
+      "path": "prototype/admin.css",
+      "bytes": 17749,
+      "lines": 192,
+      "sha256": "df64ca7bbee9dca108647d102995a1f26b5eda811854d3b14d2f76befb627130",
+      "matches_uploaded_entry": true
+    },
+    {
+      "path": "prototype/admin.html",
+      "bytes": 2458,
+      "lines": 45,
+      "sha256": "69db0ab9df4771c19f0e06f8065a25308b9020ba021ca8ba1acde96a45ed6dc0",
+      "matches_uploaded_entry": true
+    },
+    {
+      "path": "prototype/admin.js",
+      "bytes": 37315,
+      "lines": 318,
+      "sha256": "80e73b77126dcae6a7893007ece2b3b995062d290d12eb28e218cf7cc3b65b0b",
+      "matches_uploaded_entry": true
+    },
+    {
+      "path": "prototype/chat.js",
+      "bytes": 29417,
+      "lines": 368,
+      "sha256": "6e35706364bc8554aee7e26d6f0c23d2493bac106c44679e43b7f5887d01376e",
+      "matches_uploaded_entry": true
+    },
+    {
+      "path": "prototype/index.html",
+      "bytes": 66516,
+      "lines": 856,
+      "sha256": "2a5e4f757972e68d89184a534a5c5c90c6a01d3ef460d6dd57026e6400931845",
+      "matches_uploaded_entry": true
+    },
+    {
+      "path": "prototype/store.js",
+      "bytes": 31874,
+      "lines": 453,
+      "sha256": "ecd16b7dc4f799ec92937c7a1f8142d298ca5b11d0e012ae4f3e87d14e199640",
+      "matches_uploaded_entry": true
+    },
+    {
+      "path": "prototype/widgets.css",
+      "bytes": 13287,
+      "lines": 126,
+      "sha256": "99ca0f2b49cfe02d310c02771b4c83e3a5562d98fa56f11eea22fc5277a7e96e",
+      "matches_uploaded_entry": true
+    },
+    {
+      "path": "prototype/widgets.js",
+      "bytes": 15811,
+      "lines": 191,
+      "sha256": "d1e4734a072716b95948ca729f04c4944979062bdf1e55dc691654dc1e7a71a0",
+      "matches_uploaded_entry": true
+    }
+  ],
+  "assets": [
+    {
+      "path": "public/illustrations/brick.svg",
+      "bytes": 1766,
+      "sha256": "00508106c828bc8735c77abf592fa5f900856f733f6ee6853ab89aac75770d4d"
+    },
+    {
+      "path": "public/illustrations/columns.svg",
+      "bytes": 2000,
+      "sha256": "cc1abbaed5f4b0381d7e8a8f21e68583a391d4101c128ccb2b3b6953d3f2baab"
+    },
+    {
+      "path": "public/illustrations/hero.svg",
+      "bytes": 1591,
+      "sha256": "ee352c5c5cadb6ce48254c86aab5a9d0bb2cd15aa7318098ee43c7424cc18909"
+    },
+    {
+      "path": "public/illustrations/lot.svg",
+      "bytes": 1282,
+      "sha256": "8eb28e1e59485299baf3c2db440e7518ebd50963eecafa420154ed7d27a2ceb9"
+    },
+    {
+      "path": "public/illustrations/porch.svg",
+      "bytes": 1727,
+      "sha256": "d6399b2fdf273a1de89a5e96eec253f5b4dc3e8dbccceb156c5512c806136cb6"
+    },
+    {
+      "path": "public/illustrations/portrait.svg",
+      "bytes": 392,
+      "sha256": "d9fd64c3e108dd82388ffae74739c3074d60b23517e176ed698e6d54c1a0ce1f"
+    },
+    {
+      "path": "public/illustrations/ranch.svg",
+      "bytes": 1565,
+      "sha256": "927c879f1bbfccf0ca5acfc6c6daf1d177a988027946e1baf7cb1612b9370b26"
+    },
+    {
+      "path": "public/illustrations/stone.svg",
+      "bytes": 1826,
+      "sha256": "e5accfbb71eeb03c839e2ef7c36a299e4e763cf1599c581247af889d4493554e"
+    },
+    {
+      "path": "public/illustrations/stucco.svg",
+      "bytes": 1703,
+      "sha256": "82d0e1f0b675aa1e6603fab3b23434797cabd94d3fa2f4fff028cecdff4c4356"
+    },
+    {
+      "path": "public/illustrations/tower.svg",
+      "bytes": 3597,
+      "sha256": "e21f10f839b098a57efa88290b207f8c369f79e60984b3d4316caadb990912b0"
+    }
+  ]
+}

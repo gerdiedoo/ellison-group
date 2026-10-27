@@ -1,0 +1,6 @@
+node_modules
+.next
+prototype
+work
+public/illustrations
+package-lock.json
