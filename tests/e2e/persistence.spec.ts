@@ -188,6 +188,9 @@ test("public catalog, favorites and all lead forms persist to Supabase", async (
     expect(
       inquiries.data!.find((i) => i.kind === "Valuation request")?.context,
     ).toMatchObject({ address: "123 Acceptance Lane" });
+    const account = page.getByLabel("Your account", { exact: true });
+    if (await account.isVisible()) await account.click();
+    else await page.getByRole("button", { name: "Menu", exact: true }).click();
     await page.getByRole("button", { name: "Sign out", exact: true }).click();
     await expect(page).toHaveURL("http://localhost:3000/");
     await page.goto("/favorites");

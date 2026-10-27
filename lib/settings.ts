@@ -1,5 +1,6 @@
 import "server-only";
 import { privileged, configured } from "@/lib/supabase/server";
+import { defaultSuggestedPrompts } from "@/lib/chat-prompts";
 import {
   assistantSchema,
   captureSettingsSchema,
@@ -12,6 +13,7 @@ export const defaultAssistant = {
   instructions:
     "Help visitors explore published homes and connect with our team.",
   handoffEnabled: true,
+  prompts: defaultSuggestedPrompts,
 };
 export const defaultCapture = {
   headline: "Find your place with us.",

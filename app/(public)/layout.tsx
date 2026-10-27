@@ -15,7 +15,7 @@ export default async function PublicLayout({
     : null;
   return (
     <>
-      <SiteHeader name={company.name} signedIn={!!user} />
+      <SiteHeader name={company.name} signedIn={!!user} phone={company.phone} />
       <main id="main">{children}</main>
       <footer>
         <div className="wrap">
@@ -95,6 +95,7 @@ export default async function PublicLayout({
         enabled={assistant.enabled}
         welcome={assistant.welcome}
         handoffEnabled={assistant.handoffEnabled}
+        prompts={assistant.prompts}
         capture={capture}
       />
     </>

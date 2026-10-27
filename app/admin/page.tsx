@@ -20,6 +20,7 @@ import {
   FollowupCheck,
 } from "@/components/admin/overview-controls";
 import { LeadChart } from "@/components/admin/lead-chart";
+import { activityDescription, relativeTime } from "@/lib/admin-display";
 export default async function Dashboard({
   searchParams,
 }: {
@@ -49,8 +50,10 @@ export default async function Dashboard({
     .limit(5);
   let conversationsQuery = db
     .from("conversations")
-    .select("id,status,updated_at,lead:leads(full_name)")
+    .select("id,status,updated_at,lead:leads(full_name),messages(body,created_at)")
     .order("updated_at", { ascending: false })
+    .order("created_at", { referencedTable: "messages", ascending: false })
+    .limit(1, { referencedTable: "messages" })
     .limit(5);
   let activityQuery = db
     .from("activity_logs")
@@ -271,7 +274,9 @@ export default async function Dashboard({
                       <td>
                         <StatusBadge status={l.status} />
                       </td>
-                      <td>{shortDate(l.created_at)}</td>
+                      <td title={shortDate(l.created_at)}>
+                        {relativeTime(l.created_at, now)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -334,7 +339,9 @@ export default async function Dashboard({
                     {i.lead?.full_name} · {i.property?.address || "No property"}
                   </div>
                 </div>
-                <span className="m">{shortDate(i.created_at)}</span>
+                <span className="m" title={shortDate(i.created_at)}>
+                  {relativeTime(i.created_at, now)}
+                </span>
               </Link>
             ))
           ) : (
@@ -355,11 +362,14 @@ export default async function Dashboard({
               >
                 <div className="b">
                   <div className="t">
-                    {c.lead?.full_name || "Anonymous visitor"}
+                    {c.lead?.full_name || "Anonymous visitor"}{" "}
+                    <StatusBadge status={c.status} />
                   </div>
-                  <StatusBadge status={c.status} />
-                  <div className="m">{shortDate(c.updated_at)}</div>
+                  <div className="pv">{c.messages[0]?.body || ""}</div>
                 </div>
+                <span className="m" title={shortDate(c.updated_at)}>
+                  {relativeTime(c.updated_at, now)}
+                </span>
               </Link>
             ))
           ) : (
@@ -376,9 +386,11 @@ export default async function Dashboard({
               <div className="li" key={a.id}>
                 <div className="b">
                   <div className="t" style={{ fontWeight: 400 }}>
-                    {a.action} · {a.entity_type}
+                    {activityDescription(a.action, a.entity_type)}
                   </div>
-                  <div className="m">{shortDate(a.created_at)}</div>
+                  <div className="m" title={shortDate(a.created_at)}>
+                    {relativeTime(a.created_at, now)}
+                  </div>
                 </div>
               </div>
             ))

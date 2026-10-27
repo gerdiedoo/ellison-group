@@ -3,6 +3,7 @@ import { ActionForm } from "@/components/action-form";
 import { Field, Area } from "@/lib/admin-fields";
 import { saveSettings } from "@/app/actions/crm";
 import type { settings } from "@/lib/settings";
+import { PromptEditor } from "@/components/admin/prompt-editor";
 
 type Settings = Awaited<ReturnType<typeof settings>>;
 export function SettingToggle({
@@ -62,19 +63,23 @@ export function AssistantCard({
           value={a.welcome}
           rows={3}
         />
-        <Field name="tone" label="Tone preference" value={a.tone} />
-        <Area
-          name="instructions"
-          label="Assistant instructions (cannot override factual constraints)"
-          value={a.instructions}
-          rows={4}
-        />
-        <SettingToggle
-          name="handoffEnabled"
-          label="Allow visitor requests for human handoff"
-          description="Visitors can pause automated replies and join the team's inbox."
-          checked={a.handoffEnabled}
-        />
+        <PromptEditor prompts={a.prompts} />
+        <details className="assistant-advanced">
+          <summary>Advanced settings</summary>
+          <Field name="tone" label="Tone preference" value={a.tone} />
+          <Area
+            name="instructions"
+            label="Assistant instructions (cannot override factual constraints)"
+            value={a.instructions}
+            rows={4}
+          />
+          <SettingToggle
+            name="handoffEnabled"
+            label="Allow visitor requests for human handoff"
+            description="Visitors can pause automated replies and join the team's inbox."
+            checked={a.handoffEnabled}
+          />
+        </details>
       </ActionForm>
       <div className="pill-row" style={{ marginTop: 16 }}>
         <Link

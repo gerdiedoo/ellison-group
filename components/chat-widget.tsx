@@ -11,11 +11,13 @@ type Chat = {
 export function ChatWidget({
   welcome,
   handoffEnabled,
+  prompts,
   capture,
   enabled = true,
 }: {
   welcome: string;
   handoffEnabled: boolean;
+  prompts: string[];
   capture: CaptureConfig;
   enabled?: boolean;
 }) {
@@ -210,6 +212,21 @@ export function ChatWidget({
                     )}
                     {chat.status === "resolved" && (
                       <p className="notice">This conversation is resolved.</p>
+                    )}
+                    {enabled && chat.status === "bot" && (
+                      <div className="chat-prompts" aria-label="Suggested prompts">
+                        {prompts.map((prompt, index) => (
+                          <button
+                            key={index}
+                            className="chat-prompt"
+                            type="button"
+                            disabled={pending}
+                            onClick={() => send("message", prompt)}
+                          >
+                            {prompt}
+                          </button>
+                        ))}
+                      </div>
                     )}
                     <div ref={bottom} />
                   </>

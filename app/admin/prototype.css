@@ -1241,6 +1241,22 @@
 }
 .crm .prompts .pr input {
   flex: 1;
+  min-width: 0;
+}
+.crm .prompt-label {
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.crm .assistant-advanced {
+  margin: 18px 0;
+}
+.crm .assistant-advanced summary {
+  cursor: pointer;
+  color: var(--ink-2);
+  margin-bottom: 12px;
 }
 .crm .pill-row {
   display: flex;

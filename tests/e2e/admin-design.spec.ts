@@ -189,6 +189,28 @@ test("original admin geometry, sidebar behavior and responsive screens", async (
     for (const route of ["assistant", "lead-capture", "settings"]) {
       await page.goto("/admin/" + route);
       await expect(page.locator(".ph h1")).toBeVisible();
+      if (route === "assistant") {
+        const prompts = page.locator('input[name="prompts"]');
+        const savedCount = await prompts.count();
+        if (savedCount < 12) {
+          await page.getByRole("button", { name: "Add prompt", exact: true }).click();
+          await expect(prompts).toHaveCount(savedCount + 1);
+          await prompts.last().fill("Design preview suggestion");
+          await page
+            .getByRole("button", { name: `Remove prompt ${savedCount + 1}`, exact: true })
+            .click();
+          await expect(prompts).toHaveCount(savedCount);
+        }
+        await page.getByRole("button", { name: "Restore default prompts", exact: true }).click();
+        await expect(prompts).toHaveCount(6);
+        // Editing a draft never writes settings until the administrator saves.
+        await page.reload();
+        await expect(prompts).toHaveCount(savedCount);
+        await page.getByText("Advanced settings", { exact: true }).click();
+        await expect(page.getByLabel("Tone preference", { exact: true })).toBeVisible();
+        await page.getByText("Advanced settings", { exact: true }).click();
+      }
+      await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
       await page.screenshot({
         path: `work/admin-parity/${route}-${info.project.name}.png`,
         fullPage: true,

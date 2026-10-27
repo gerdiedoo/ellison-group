@@ -86,3 +86,22 @@ The completed full production-browser regression executed 36 cases: 33 passed, 2
 After the final source-label/color refinement, the focused rerun passed both prototype-comparison cases and the desktop Gemini case. The repeated mobile Gemini case encountered provider unavailability (including its retry); that same full mobile chat/handoff/resume case had passed in the full regression. All 34 applicable unique browser scenarios therefore passed at least once across these runs, but no single completely green external-service run is claimed. API-dependent Gemini availability remains intermittent; the application displays and persists its unavailable response honestly.
 
 Visual captures use temporary marked data, not invented production figures. No historical listing was published or existing user promoted. No new database migration or environment variable is needed for the interface restoration. The previously recorded hosted migration 006 requirement remains separate. The reference prototype was served only on a separate local test port; it is not part of the deployed application.
+
+## Latest prototype follow-up and requested demo data — October 27, 2026
+
+The second uploaded bundle matched all ten original source files. The follow-up restores editable suggested prompts, saved conversation previews and readable audit labels, the public home inventory/filter section, and the original mobile forest navigation. A public `/api/version` endpoint identifies the running interface revision without exposing configuration. The user's preview is their own `localhost:3000` server; pulling and restarting/rebuilding that checkout is documented in LOCAL_PREVIEW.md.
+
+Executed checks:
+
+- TypeScript and ESLint passed after the final implementation and test-selector changes.
+- Production `next build --webpack` passed. The final browser bundle scan checked 64 JavaScript/JSON/map artifacts against the actual server credential values and found no privileged secrets.
+- All **90 unit tests across 11 files** passed, including suggested-prompt validation/defaults.
+- Prototype preservation matched all **10 archived source files and 10 illustrations**.
+- The full desktop/mobile browser run executed **38 cases: 32 passed, 2 skipped, 4 failed**. Two failures were real Gemini provider **429** responses. The other two were outdated sign-out selectors after restoring account/mobile menus; the tests were updated to open the visible menu first.
+- The focused rerun of both prototype-comparison and both complete public-to-admin persistence cases passed **4/4**. Across these runs, **34 unique UI/data browser cases passed**. Both Gemini cases remain failed in this follow-up; they were not retried or counted as passed. The two skipped cases require deliberately missing integration configuration, which this project has configured.
+- Desktop/mobile admin geometry was compared with the unchanged source; screenshots captured the primary CRM screens. The new home collection/navigation cases passed on both devices. Full CRM CRUD/direct-API authorization checks passed on both devices, as did catalog/images/favorites and all five public inquiry flows into one normalized CRM lead after correcting the test navigation.
+- `/api/version` returned HTTP 200 and `interfaceRevision: "prototype-parity-2"` from the local production server.
+
+At the user's explicit request, the configured Supabase project now retains six `[DEMO]` leads, six inquiries, three conversations, nine messages, four tasks, four interested-property links and two unpublished properties. The seed's removal was actually executed and the exact IDs verified absent; final recreation succeeded. A second seed inserted zero rows and preserved all existing field values. Service queries verified counts and parent references; anonymous publishable-key queries returned no draft properties and denied private CRM tables. No authentication accounts, existing staff roles, real contacts, company settings or original historical drafts were changed by the seed. Immutable audit records remain. See DEMO_DATA.md for repeatable seeding/removal.
+
+No new migration or external credential is required for this interface update. The previously documented hosted migration 006 and Google consent/production callback acceptance remain independent setup boundaries. No hosted deployment or successful Gemini response is claimed for this follow-up.

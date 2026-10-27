@@ -7,6 +7,7 @@ import {
   propertySchema,
   assistantSchema,
 } from "../../lib/validation";
+import { defaultSuggestedPrompts } from "../../lib/chat-prompts";
 const base = {
   request_id: "00000000-0000-4000-8000-000000000001",
   full_name: "A Visitor",
@@ -131,6 +132,36 @@ describe("search pagination boundaries", () => {
   ])("bounds page %s to %s", (input, expected) =>
     expect(pageNumber(input)).toBe(expected),
   );
+});
+
+describe("saved assistant suggestions", () => {
+  const settings = {
+    enabled: true,
+    welcome: "Hello",
+    tone: "Warm",
+    instructions: "Help",
+    handoffEnabled: true,
+  };
+  it("uses the original suggestions for existing settings records", () => {
+    expect(assistantSchema.parse(settings).prompts).toEqual(
+      defaultSuggestedPrompts,
+    );
+  });
+  it("normalizes edited suggestions and allows removing all suggestions", () => {
+    expect(
+      assistantSchema.parse({ ...settings, prompts: ["  Find a home.  "] })
+        .prompts,
+    ).toEqual(["Find a home."]);
+    expect(assistantSchema.parse({ ...settings, prompts: [] }).prompts).toEqual(
+      [],
+    );
+  });
+  it("rejects blank, oversized and excessive suggestions", () => {
+    for (const prompts of [[" "], ["x".repeat(201)], Array(13).fill("Hello")])
+      expect(assistantSchema.safeParse({ ...settings, prompts }).success).toBe(
+        false,
+      );
+  });
 });
 
 describe("public inquiry preferences", () => {

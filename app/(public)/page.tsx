@@ -1,17 +1,24 @@
 import Link from "next/link";
-import { catalog, money, neighborhoodCounts } from "@/lib/data";
+import { catalog, money, neighborhoodCounts, type Search } from "@/lib/data";
+import { HomeInventory } from "@/components/home-inventory";
 import { NeighborhoodExplorer } from "@/components/neighborhood-explorer";
 import { AboutContent } from "@/components/about-content";
 import { ClientStories } from "@/components/client-stories";
 import { IntentSearch } from "@/components/intent-search";
-export default async function Home() {
-  const [{ properties, unconfigured }, counts] = await Promise.all([
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<Search>;
+}) {
+  const params = await searchParams;
+  const [{ properties, unconfigured }, counts, inventory] = await Promise.all([
     catalog(),
     neighborhoodCounts(),
+    catalog(params),
   ]);
   return (
     <>
-      <div className="hero">
+      <div className="hero" id="top">
         <div
           className="hero-art"
           style={{
@@ -20,6 +27,9 @@ export default async function Home() {
             backgroundSize: "cover",
           }}
         />
+        <div className="scrollcue" aria-hidden="true">
+          Scroll
+        </div>
         <div className="wrap hero-in">
           <div className="hero-grid">
             <div>
@@ -83,12 +93,13 @@ export default async function Home() {
             <div>
               <span className="eyebrow">Selected homes</span>
               <h2>
-                Spaces with <em>a story.</em>
+                Three to <em>linger</em> over
               </h2>
             </div>
-            <Link href="/properties" className="link">
-              Explore all homes →
-            </Link>
+            <p>
+              A short, considered selection from our current listings. The full
+              inventory follows below, searchable and filterable.
+            </p>
           </div>
           {properties.length ? (
             <div className="stack">
@@ -140,6 +151,7 @@ export default async function Home() {
         </div>
       </section>
       <NeighborhoodExplorer counts={counts} />
+      <HomeInventory {...inventory} params={params} />
       <AboutContent />
       <ClientStories />
       <section className="value">

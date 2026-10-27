@@ -1841,6 +1841,27 @@ td a {
   display: flex;
   gap: 8px;
 }
+.chat-prompts {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+}
+.chat-prompt {
+  padding: 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  text-align: left;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.chat-prompt:hover {
+  background: var(--paper-2);
+}
+.chat-prompt:disabled {
+  opacity: .55;
+  cursor: wait;
+}
 .chat-form input {
   min-width: 0;
   flex: 1;
@@ -2022,3 +2043,38 @@ footer {
   .chat-launch { right: 16px; bottom: 16px; width: 56px; height: 56px; padding: 16px; justify-content: center; }
   .chat-launch .chat-label { display: none; }
 }
+
+/* Public prototype navigation and inline collection. */
+.public-navigation { position: sticky; top: 0; z-index: 60; }
+.public-navigation header.site.home-header { position: fixed; top: 0; background: transparent; color: #fff; border-bottom-color: transparent; }
+.public-navigation header.site.home-header.solid { background: rgba(243,238,230,.94); color: var(--ink); border-bottom-color: var(--line); }
+.public-navigation.menu-open header.site,.public-navigation.menu-open header.site.home-header.solid { position: fixed; top: 0; background: transparent; color: #fff; border-bottom-color: transparent; }
+.public-navigation .logo { white-space: nowrap; }
+.public-navigation .nav { gap: 16px; }
+.public-navigation .nav ul { gap: clamp(16px,1.8vw,28px); white-space: nowrap; }
+.public-navigation .nav .right { gap: 14px; flex-shrink: 0; }
+.account-menu { position: relative; }
+.account-menu summary { display: grid; place-items: center; width: 32px; height: 38px; cursor: pointer; list-style: none; }
+.account-menu summary::-webkit-details-marker { display: none; }
+.account-links { position: absolute; right: 0; top: calc(100% + 10px); min-width: 170px; padding: 16px; background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 10px 30px #14221b18; display: grid; gap: 12px; }
+.account-links a:hover { text-decoration: underline; }
+.public-navigation .drawer { padding-top: 80px; padding-bottom: 28px; overflow: auto; }
+.public-navigation .drawer-utilities { display: flex; flex-wrap: wrap; align-items: center; gap: 24px; margin-top: 18px; }
+.public-navigation .drawer-utilities a,.public-navigation .drawer-utilities .signin-link { font: 400 15px var(--sans); padding: 4px 0; border: 0; text-decoration: underline; }
+.home-inventory { scroll-margin-top: 90px; }
+.home-inventory h2,#homes .sec-head h2 { margin-top: 14px; }
+.home-filters input[type="search"] { border: 1px solid var(--line); border-radius: 999px; padding: 9px 14px; background: transparent; font: 400 13.5px var(--sans); min-width: 0; width: min(240px,60vw); }
+.home-filters button:disabled,.home-filters select:disabled,.home-filters input:disabled { opacity: .55; cursor: wait; }
+.home-filters .inventory-search { display: flex; gap: 8px; }
+.inventory-card { display: flex; flex-direction: column; gap: 12px; text-align: left; min-width: 0; }
+.inventory-card .ph { position: relative; aspect-ratio: 4/3; overflow: hidden; border-radius: 4px; }
+.inventory-card .ph .art { width: 100%; height: 100%; object-fit: cover; transition: transform .9s cubic-bezier(.2,.7,0,1); }
+.inventory-card:hover .art,.inventory-card:focus-visible .art { transform: scale(1.05); }
+.inventory-card h3 { font: 400 21px/1.2 var(--serif); letter-spacing: -.01em; }
+.inventory-card .meta { display: flex; justify-content: space-between; gap: 10px; font-size: 13.5px; color: var(--muted); }
+.inventory-card .meta b { color: var(--ink); font-weight: 500; white-space: nowrap; }
+.inventory-pagination { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; margin-top: 32px; }
+@media (max-width: 1240px) { .public-navigation .nav .right .tel { display: none; } }
+@media (max-width: 1150px) { .public-navigation .burger { display: flex; } .public-navigation .account-menu { display: none; } }
+@media (max-width: 640px) { .public-navigation .logo { font-size: 20px; gap: 6px; } .public-navigation .logo small { font-size: 8px; } .public-navigation .nav { gap: 10px; } .public-navigation .drawer > a { font-size: clamp(30px,7vw,44px); } .home-filters .count { width: 100%; margin-left: 0; } }
+@media (min-width: 1151px) { .public-navigation .drawer { display: none; } }

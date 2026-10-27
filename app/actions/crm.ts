@@ -239,6 +239,7 @@ export async function saveSettings(
         tone: str(f, "tone"),
         instructions: str(f, "instructions"),
         handoffEnabled: checked(f, "handoffEnabled"),
+        prompts: f.getAll("prompts"),
       });
     else
       value = captureSettingsSchema.parse({

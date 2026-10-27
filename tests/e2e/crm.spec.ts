@@ -4,6 +4,7 @@ import { test, expect, type Page, type Locator } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { randomBytes, randomUUID } from "node:crypto";
+import { assistantSchema } from "../../lib/validation";
 const png = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a+z8AAAAASUVORK5CYII=",
   "base64",
@@ -458,7 +459,11 @@ test("protected CRM workflows and direct API permissions", async ({
         .select("value,updated_at")
         .eq("key", keyName)
         .single();
-      expect(after.data?.value).toEqual(before.data?.value);
+      expect(after.data?.value).toEqual(
+        keyName === "assistant"
+          ? assistantSchema.parse(before.data?.value)
+          : before.data?.value,
+      );
       expect(after.data?.updated_at).not.toBe(before.data?.updated_at);
     }
     await page.goto("/admin/team?q=" + token);

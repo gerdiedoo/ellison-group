@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { defaultSuggestedPrompts } from "@/lib/chat-prompts";
 export const leadStatuses = [
   "New",
   "Contacted",
@@ -131,6 +132,10 @@ export const assistantSchema = z.object({
   tone: z.string().max(300),
   instructions: z.string().max(4000),
   handoffEnabled: z.boolean(),
+  prompts: z
+    .array(z.string().trim().min(1).max(200))
+    .max(12)
+    .default(defaultSuggestedPrompts),
 });
 export const captureSettingsSchema = z.object({
   headline: z.string().trim().min(1).max(200),

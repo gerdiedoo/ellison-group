@@ -17,6 +17,8 @@ npm run dev
 
 Visit http://localhost:3000; the CRM is at `/admin`. Without Supabase configuration, public editorial pages still render and listings show an explicit unavailable state. Forms, authentication and AI never report simulated success.
 
+If your local admin still shows an older interface, follow [LOCAL_PREVIEW.md](docs/LOCAL_PREVIEW.md) to pull `development`, restart the correct server and check `/api/version`. The repeatable [demo dataset](docs/DEMO_DATA.md) populates the CRM with clearly labeled examples; `npm run seed:demo` preserves existing records and creates only unpublished sample properties.
+
 ## Environment
 
 | Variable                               | Purpose                                                                                                                   |
