@@ -72,11 +72,9 @@ export function ChatWidget({
       clearInterval(t);
     };
   }, [open, chat?.id]);
-  useEffect(
-    () =>
-      bottom.current?.scrollIntoView({ behavior: "smooth", block: "nearest" }),
-    [chat?.messages.length],
-  );
+  useEffect(() => {
+    bottom.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [chat?.messages.length]);
   async function send(action: "message" | "handoff" | "start", body?: string) {
     setPending(true);
     setError("");

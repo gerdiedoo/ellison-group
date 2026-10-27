@@ -33,9 +33,10 @@ const publicSchema = z
 export const serverEnvironmentSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: optionalValue,
   GOOGLE_GEMINI_API_KEY: optionalValue,
+  GOOGLE_GEMINI_FALLBACK_MODEL: optionalValue,
   GOOGLE_GEMINI_MODEL: z.preprocess(
     (value) => value || undefined,
-    z.string().trim().min(1).default("gemini-2.5-flash"),
+    z.string().trim().min(1).default("gemini-flash-latest"),
   ),
   NEXT_PUBLIC_SITE_URL: z.preprocess(
     (value) => value || undefined,

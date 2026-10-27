@@ -10,9 +10,10 @@ export default async function Dashboard() {
     "tasks",
   ] as const;
   const results = await Promise.all(
-    tables.map((t) => db.from(t).select("*", { count: "exact", head: true })),
+    tables.map((t) => db.from(t).select("id", { count: "exact" }).limit(1)),
   );
-  if (results.some((r) => r.error)) throw new Error("Unable to load dashboard");
+  if (results.some((r) => r.error || r.count === null))
+    throw new Error("Unable to load dashboard");
   const { data: tasks, error } = await db
     .from("tasks")
     .select("*")
@@ -37,7 +38,7 @@ export default async function Dashboard() {
             key={t}
           >
             <span className="eyebrow">{t}</span>
-            <div className="metric">{results[i].count || 0}</div>
+            <div className="metric">{results[i].count ?? 0}</div>
             <small>All stored records</small>
           </Link>
         ))}

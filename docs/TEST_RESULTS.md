@@ -1,17 +1,17 @@
 # Executed verification
 
-Latest foundation verification: October 27, 2026, following the initial implementation checks on October 26. No external Supabase or Gemini credentials were configured.
+Initial foundation verification: October 27, 2026, following implementation checks on October 26. These checks preceded configuration of external Supabase/Gemini credentials; later live-service results follow below.
 
-| Check | Result |
-| --- | --- |
-| `npm run typecheck` | Passed |
-| `npm run lint` | Passed; no warnings or errors |
-| `npm run build` | Passed, using Next.js's supported webpack compiler |
-| `npm run test` | 51 unit tests passed across four files; compile-time insert/identity contracts passed with TypeScript |
-| `npm run test:db` | All five migrations applied to fresh PostgreSQL 17; 42 database/security assertions passed with deliberately broad PUBLIC/API defaults |
-| Playwright desktop and mobile | 22 tests passed, using the actual production server |
-| `npm run verify:prototype` | 10 original source files and 10 illustration assets matched their SHA-256 manifest |
-| Browser bundle secret-name scan | No service-role key or Gemini API key variable references found in `.next/static` |
+| Check                           | Result                                                                                                                                 |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run typecheck`             | Passed                                                                                                                                 |
+| `npm run lint`                  | Passed; no warnings or errors                                                                                                          |
+| `npm run build`                 | Passed, using Next.js's supported webpack compiler                                                                                     |
+| `npm run test`                  | 51 unit tests passed across four files; compile-time insert/identity contracts passed with TypeScript                                  |
+| `npm run test:db`               | All five migrations applied to fresh PostgreSQL 17; 42 database/security assertions passed with deliberately broad PUBLIC/API defaults |
+| Playwright desktop and mobile   | 22 tests passed, using the actual production server                                                                                    |
+| `npm run verify:prototype`      | 10 original source files and 10 illustration assets matched their SHA-256 manifest                                                     |
+| Browser bundle secret-name scan | No service-role key or Gemini API key variable references found in `.next/static`                                                      |
 
 ## Foundation verification details
 
@@ -37,9 +37,9 @@ The browser suite uses the actual production Next.js server without service cred
 
 An initial added browser assertion matched both the form alert and Next.js's route accessibility announcer. It was scoped to the main content before the final rerun. This was a test locator issue; the form already displayed the correct unavailable-service error.
 
-## Not verified against live services
+## Initial foundation boundary
 
-No claims are made for successful live Google OAuth, Supabase Auth sessions, real Storage HTTP uploads, Gemini calls, or authenticated CRM browser workflows. The isolated PostgreSQL suite validates database logic and policies, not GoTrue/PostgREST/Storage HTTP behavior. Real database-backed public filtering/pagination and authenticated CRUD need the configured-project acceptance checks in README.
+At the foundation stage, successful live Google OAuth, Supabase Auth sessions, Storage HTTP uploads, Gemini calls and authenticated CRM browser workflows had not been verified. The isolated PostgreSQL suite validates database logic and policies, not GoTrue/PostgREST/Storage HTTP behavior. Real database-backed public filtering/pagination and authenticated CRUD need the configured-project acceptance checks in README.
 
 Turbopack failed to create its worker socket in this environment. The final scripts use the supported webpack compiler, whose production build completed successfully. The Supabase CLI's initialization also could not create its global configuration directory on the read-only user home; the isolated PostgreSQL tests avoided that limitation. Application setup can use the Supabase SQL Editor or a normally configured CLI.
 
@@ -52,3 +52,17 @@ The optional draft import preserved all 16 prototype listings in the database as
 Current unit count: 53 passed. The two unconfigured-environment browser cases are skipped when credentials are present; live persistence cases run instead. See the final browser verification result recorded below. Google consent is interactive and was not automated; Gemini's prior provider-overload response remains unrelated to these public form/database checks.
 
 Final public-site result: production build, TypeScript and lint passed; 53 unit tests passed; 22 desktop/mobile browser tests passed, including actual Supabase Storage upload/public image read, sign-in/sign-out, favorites, and four persisted lead/inquiry flows. Two unconfigured-only cases were skipped because live credentials are present. All 10 source files and 10 original SVG assets passed preservation checks. Temporary acceptance users, properties, images and leads were removed; real audit events remain immutable by design.
+
+## CRM and Gemini acceptance — October 27, 2026
+
+Final application verification: TypeScript, ESLint and the production build passed; 68 unit tests passed. All five migrations applied to disposable PostgreSQL 17 and all 42 database/security assertions passed again. The preservation check matched all 10 original source files and all 10 SVG assets. A scan of `.next/static` found neither privileged secret values nor service-role/Gemini key variable references.
+
+The full production-browser regression executed 28 cases: 25 passed, two unconfigured-only cases were skipped because live credentials are present, and the mobile Gemini case encountered an actual provider 503. That unchanged mobile case was rerun separately and passed (34.1 seconds), without needing its configured retry. Thus all 26 applicable desktop/mobile scenarios passed across these final runs; this was not a single uninterrupted green run. Desktop chat passed in 37.5 seconds, and both complete CRM acceptance cases passed in the full run.
+
+The live CRM cases verify property create/edit/publish/unpublish/delete, genuine image upload/read/removal and rejected forged PNG data, normalized manual leads, notes/interests/tasks, inquiry status/assignment, inbox replies/resolution/internal notes, unchanged-value settings persistence, team role management, dashboard counts, analytics, audit history and filtered CSV export. Direct public-key API sessions verify visitor/anonymous privacy, agent CRUD, note-author restrictions, self-escalation denial, immutable audits, settings restrictions, inactive-agent denial, visitor upload denial and agent Storage access. A captured administrator Server Action replayed with visitor cookies was rejected.
+
+The live chatbot cases verify actual Gemini-selected published property prices, features and links; exclusion of a draft; HttpOnly visitor identity; cross-browser transcript/message denial; foreign-origin denial; provider-independent natural-language human handoff; no assistant messages while human handling remains active, even with a malicious resume claim; consented lead creation and normalized deduplication with two preserved inquiries; the same visitor messages in the staff inbox; staff replies appearing in the visitor widget; explicit staff bot resume followed by a real factual AI reply; rejection of a late completion after a simulated in-flight lease and handoff; and rejection of writes to a resolved conversation.
+
+Earlier iterations exposed an ambiguous select label, loss of form input after invalid uploads, and an effect returning the browser's scroll result as React cleanup. These were corrected before the final checks. Provider overload/timeouts were real: the alias/fallback models were intermittent. The local configuration now uses an available `gemini-3.5-flash`; SDK automatic retries are disabled and an optional explicit fallback is bounded. Provider failures continue to produce a persisted, honest unavailable message. Model availability remains an external dependency.
+
+Tests use only explicitly marked temporary accounts/properties/leads/conversations/images, clean their own fixtures, and preserve immutable audit events. No existing user was promoted and no historical draft was published. Google consent and production deployment/callbacks were not automated or claimed as verified.

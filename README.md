@@ -19,16 +19,17 @@ Visit http://localhost:3000; the CRM is at `/admin`. Without Supabase configurat
 
 ## Environment
 
-| Variable | Purpose |
-| --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Public publishable key (legacy anon key also works) |
-| `SUPABASE_SERVICE_ROLE_KEY` | Server-only legacy service-role key; never prefix with NEXT_PUBLIC |
-| `GOOGLE_GEMINI_API_KEY` | Server-only Gemini API key |
-| `GOOGLE_GEMINI_MODEL` | Model ID; defaults to `gemini-2.5-flash`; change to a model available to your account |
-| `NEXT_PUBLIC_SITE_URL` | Exact canonical origin, e.g. `https://your-domain.com`; local default `http://localhost:3000` |
-| `RATE_LIMIT_SALT` | Random secret of at least 32 bytes; generate with `openssl rand -hex 32` |
-| `GOOGLE_OAUTH_ENABLED` | `true` only after configuring the Google provider in Supabase; otherwise `false` |
+| Variable                               | Purpose                                                                                                                   |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`             | Supabase project URL                                                                                                      |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Public publishable key (legacy anon key also works)                                                                       |
+| `SUPABASE_SERVICE_ROLE_KEY`            | Server-only legacy service-role key; never prefix with NEXT_PUBLIC                                                        |
+| `GOOGLE_GEMINI_API_KEY`                | Server-only Gemini API key                                                                                                |
+| `GOOGLE_GEMINI_MODEL`                  | Model ID; defaults to `gemini-flash-latest`; change to a model available to your account                                  |
+| `GOOGLE_GEMINI_FALLBACK_MODEL`         | Optional available model ID; one retry on unavailable-model/transient server errors, never authentication or quota errors |
+| `NEXT_PUBLIC_SITE_URL`                 | Exact canonical origin, e.g. `https://your-domain.com`; local default `http://localhost:3000`                             |
+| `RATE_LIMIT_SALT`                      | Random secret of at least 32 bytes; generate with `openssl rand -hex 32`                                                  |
+| `GOOGLE_OAUTH_ENABLED`                 | `true` only after configuring the Google provider in Supabase; otherwise `false`                                          |
 
 The public Supabase URL and publishable key must be supplied together; partial or malformed configuration fails validation. The site URL must be an HTTP(S) origin without a path, query, hash or embedded credentials; a trailing slash is normalized. OAuth accepts only `true` or `false`. Non-empty rate-limit salts must have at least 32 characters and must replace example text. Missing credentials still permit a local editorial preview, but do not enable authentication or data writes.
 
@@ -90,9 +91,9 @@ No application user can change their own role/active status. Agents cannot manag
 
 ## Gemini and handoff
 
-Obtain a Google Gemini API key, enable an available model and set the server environment variables. Gemini classifies the visitor's request and selects IDs from up to 100 recently updated **published** records. The server renders recorded prices, availability, descriptions and features; unsupported information leads to an explicit limitation and human assistance. No speculative company policies or automated valuations are generated. All model calls run on the server, with a timeout.
+Obtain a Google Gemini API key, enable an available model and set the server environment variables. Gemini classifies the visitor's request and selects IDs from up to 100 recently updated **published** records. The server renders recorded prices, availability, descriptions and features; unsupported information leads to an explicit limitation and human assistance. No speculative company policies or automated valuations are generated. All model calls run on the server, with a timeout. Selected records are re-read as published after generation to avoid stale facts. Unknown intent produces a limitation. The optional fallback is attempted only for 404/408/500/502/503/504 errors. With a fallback, each call has a 15-second timeout; otherwise 25 seconds. SDK retries are disabled; only the explicit fallback may retry. Configure models available on your account.
 
-The chat is private to a browser's HttpOnly visitor cookie. Only the conversation UUID is stored in localStorage. Messages persist in Supabase and are polled every five seconds in the public widget and staff inbox. “Talk to an agent” switches handling to `human`; share contact details to associate a deduplicated lead and handoff inquiry. Staff must enable human handling before replying. A staff member must explicitly select `bot` to resume AI replies. Revision checks discard late AI responses after handoff or resolution. Visitors cannot resume automated handling themselves.
+The chat is private to a browser's HttpOnly visitor cookie. Only the conversation UUID is stored in localStorage. Messages persist in Supabase and are polled every five seconds in the public widget and staff inbox. “Talk to an agent” or an explicit natural-language request switches handling to `human` without depending on Gemini; share contact details to associate a deduplicated lead and handoff inquiry. Staff must enable human handling before replying. A staff member must explicitly select `bot` to resume AI replies. Revision checks discard late AI responses after handoff or resolution. Visitors cannot resume automated handling themselves.
 
 ## Public and CRM routes
 
@@ -100,7 +101,7 @@ Public: `/`, `/properties`, `/properties/[slug]`, `/neighborhoods`, `/about`, `/
 
 Staff: `/admin`, `/admin/leads` and lead detail, `/admin/properties` and create/edit, `/admin/inquiries`, `/admin/conversations` and transcript, `/admin/activity`, `/admin/analytics`. Admin only: `/admin/team`, `/admin/assistant`, `/admin/lead-capture`, `/admin/settings`.
 
-The CRM uses actual stored counts. Listings support publication, pricing/features/status, agent assignments, image galleries, adding/removing photos and deletion. Leads retain inquiries, notes, tasks, interested properties and audit history. Inquiries and conversations support assignment/status updates. Public search supports location, neighborhood, price bounds, bedrooms, listing status, sorting and pagination. Favorites persist per authenticated user.
+The CRM uses actual stored counts. Listings support publication, pricing/features/status, agent assignments, image galleries, adding/removing photos and deletion. Leads support manual creation with contact permission, normalized email editing, deletion confirmation, source/status/date/agent filters, sorting and protected CSV export. Notes, editable follow-up tasks, interested properties, inquiries and audit history stay linked. CSV cells are quoted and protected against spreadsheet formulas. Invalid submissions retain form values for correction. Inquiries and conversations support assignment/status updates. Public search supports location, neighborhood, price bounds, bedrooms, listing status, sorting and pagination. Favorites persist per authenticated user.
 
 ## Checks
 
@@ -140,3 +141,14 @@ Public pages share Supabase-backed listings/settings, stable sorted pagination, 
 Run `npm run import:prototype` with server credentials to preserve the 16 supplied listing records in Supabase as unpublished drafts. Existing slugs are never overwritten. Review historical prices/status and publish verified inventory through the CRM; the website does not hardcode those records or publish unverified history automatically.
 
 `tests/e2e/persistence.spec.ts` creates temporary, explicitly marked listing/account fixtures and exercises real database persistence from the browser, then removes fixtures in `finally`. Run this acceptance suite against a test Supabase project. Playwright loads `.env.local` when present. The managed cloud execution environment needs its configured outbound proxy (`NODE_USE_ENV_PROXY=1`); ordinary hosting does not require this flag.
+
+## CRM and chatbot acceptance
+
+`tests/e2e/crm.spec.ts` uses temporary admin/agent/visitor accounts to test actual property uploads/publication, leads/notes/tasks/interests, inquiry assignment, staff replies, settings persistence, roles, audit and analytics, and direct API denials. It saves existing configuration values unchanged. `tests/e2e/chat.spec.ts` calls the real Gemini API with temporary published/draft records and verifies factual output, private transcripts, consented lead capture/deduplication, human handling, staff replies, explicit bot resume and rejected late responses. Credentials remain in the Node test runner. Use a test Supabase project and run serially:
+
+```sh
+npm run build
+npx playwright test --workers=1
+```
+
+Fixture cleanup removes only records created by the tests; server-generated audit events remain immutable. Provider quotas/outages can cause the real-Gemini assertions to fail; the application must show an explicit unavailable response and still allow handoff. Google consent and deployment callbacks require separate acceptance.

@@ -3,7 +3,17 @@ import Link from "next/link";
 import { requireStaff } from "@/lib/auth";
 import { ActionForm } from "@/components/action-form";
 import { Field, Area, Select, Assignment, Check } from "@/lib/admin-fields";
-import { updateLead, addNote, addTask, updateTask } from "@/app/actions/crm";
+import {
+  updateLead,
+  addNote,
+  addTask,
+  updateTask,
+  deleteLead,
+  addInterest,
+  removeInterest,
+  deleteNote,
+  deleteTask,
+} from "@/app/actions/crm";
 import { leadStatuses } from "@/lib/validation";
 export default async function LeadDetail({
   params,
@@ -53,6 +63,10 @@ export default async function LeadDetail({
           interests.data.map((i) => i.property_id),
         )
     : { data: [] };
+  const { data: allProperties } = await db
+    .from("properties")
+    .select("id,address")
+    .order("address");
   return (
     <>
       <Link className="link" href="/admin/leads">
@@ -73,6 +87,13 @@ export default async function LeadDetail({
               value={l.full_name}
               required
             />
+            <Field
+              name="email"
+              label="Email"
+              type="email"
+              value={l.email}
+              required
+            />
             <Field name="phone" label="Phone" value={l.phone} />
             <Select
               name="status"
@@ -90,12 +111,31 @@ export default async function LeadDetail({
           </p>
           <h2>Interested properties</h2>
           {properties?.map((p) => (
-            <p key={p.id}>
+            <div key={p.id}>
               <Link className="link" href={"/admin/properties/" + p.id}>
                 {p.address}
               </Link>
-            </p>
+              <ActionForm action={removeInterest} label="Remove interest">
+                <input type="hidden" name="lead_id" value={id} />
+                <input type="hidden" name="property_id" value={p.id} />
+              </ActionForm>
+            </div>
           ))}
+          <ActionForm action={addInterest} label="Add interested property">
+            <input type="hidden" name="lead_id" value={id} />
+            <div className="field">
+              <label>
+                Property
+                <select aria-label="Property" name="property_id" required>
+                  {allProperties?.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.address}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </ActionForm>
         </section>
         <section className="card" style={{ padding: 24 }}>
           <h2>Internal notes</h2>
@@ -110,6 +150,9 @@ export default async function LeadDetail({
                   timeZone: "America/Chicago",
                 })}
               </small>
+              <ActionForm action={deleteNote} label="Delete note">
+                <input type="hidden" name="id" value={n.id} />
+              </ActionForm>
             </div>
           ))}
           <ActionForm action={addNote} label="Add note">
@@ -130,7 +173,19 @@ export default async function LeadDetail({
             </p>
             <ActionForm action={updateTask} label="Update task">
               <input type="hidden" name="id" value={t.id} />
+              <Field name="title" label="Task title" value={t.title} required />
+              <Field
+                name="due_at"
+                label="Due date"
+                type="date"
+                value={t.due_at.slice(0, 10)}
+                required
+              />
+              <Assignment team={team.data || []} value={t.assigned_to} />
               <Check name="done" label="Completed" checked={t.done} />
+            </ActionForm>
+            <ActionForm action={deleteTask} label="Delete task">
+              <input type="hidden" name="id" value={t.id} />
             </ActionForm>
           </div>
         ))}
@@ -158,6 +213,19 @@ export default async function LeadDetail({
           <small>{i.created_at}</small>
         </div>
       ))}
+      {
+        <div className="card">
+          <h2>Delete lead</h2>
+          <p>
+            Deletes this lead, their inquiries, notes and tasks. Audit records
+            remain. Conversations are retained without the lead association.
+          </p>
+          <ActionForm action={deleteLead} label="Delete lead">
+            <input type="hidden" name="id" value={id} />
+            <Check name="confirm" label="Confirm permanent lead deletion" />
+          </ActionForm>
+        </div>
+      }
       <h2>Lead activity</h2>
       {activity.data?.map((a) => (
         <p key={a.id}>

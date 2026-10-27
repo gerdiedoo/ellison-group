@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireStaff } from "@/lib/auth";
 import {
   propertySchema,
+  emailSchema,
   leadStatuses,
   inquiryStatuses,
   assistantSchema,
@@ -50,12 +51,18 @@ export async function updateLead(
   const { db } = await requireStaff();
   try {
     const patch = {
+      email: emailSchema.parse(str(f, "email")),
       full_name: z.string().min(2).max(120).parse(str(f, "full_name")),
       phone: z.string().max(40).parse(str(f, "phone")),
       status: z.enum(leadStatuses).parse(f.get("status")),
       assigned_to: await assignment(db, f),
     };
-    const { error } = await db.from("leads").update(patch).eq("id", id(f));
+    const { error } = await db
+      .from("leads")
+      .update(patch)
+      .eq("id", id(f))
+      .select("id")
+      .single();
     if (error) throw new Error("Unable to update lead.");
     refresh();
     return { success: "Lead updated." };
@@ -116,8 +123,17 @@ export async function updateTask(
   try {
     const { error } = await db
       .from("tasks")
-      .update({ done: checked(f, "done") })
-      .eq("id", id(f));
+      .update({
+        done: checked(f, "done"),
+        title: z.string().trim().min(1).max(500).parse(str(f, "title")),
+        due_at: new Date(
+          z.iso.date().parse(str(f, "due_at")) + "T17:00:00Z",
+        ).toISOString(),
+        assigned_to: await assignment(db, f),
+      })
+      .eq("id", id(f))
+      .select("id")
+      .single();
     if (error) throw new Error("Unable to update task");
     refresh();
     return { success: "Task updated." };
@@ -137,7 +153,9 @@ export async function updateInquiry(
         status: z.enum(inquiryStatuses).parse(f.get("status")),
         assigned_to: await assignment(db, f),
       })
-      .eq("id", id(f));
+      .eq("id", id(f))
+      .select("id")
+      .single();
     if (error) throw new Error("Unable to update inquiry");
     refresh();
     return { success: "Inquiry updated." };
@@ -159,7 +177,9 @@ export async function updateConversation(
         assigned_to: await assignment(db, f),
         processing_until: null,
       })
-      .eq("id", id(f));
+      .eq("id", id(f))
+      .select("id")
+      .single();
     if (error) throw new Error("Unable to update conversation");
     refresh();
     return {
@@ -231,7 +251,9 @@ export async function saveSettings(
     const { error } = await db
       .from("settings")
       .update({ value })
-      .eq("key", key);
+      .eq("key", key)
+      .select("key")
+      .single();
     if (error) throw new Error("Unable to save settings.");
     refresh();
     return { success: "Settings saved." };
@@ -253,7 +275,12 @@ export async function updateProfile(
       role: z.enum(["visitor", "agent", "admin"]).parse(f.get("role")),
       active: checked(f, "active"),
     };
-    const { error } = await db.from("profiles").update(patch).eq("id", target);
+    const { error } = await db
+      .from("profiles")
+      .update(patch)
+      .eq("id", target)
+      .select("id")
+      .single();
     if (error) throw new Error("Unable to update team member");
     refresh();
     return { success: "Team profile updated." };
@@ -359,7 +386,9 @@ export async function saveProperty(
     const { error } = await db
       .from("properties")
       .update({ ...patch, images })
-      .eq("id", propertyId);
+      .eq("id", propertyId)
+      .select("id")
+      .single();
     if (error)
       throw new Error(
         "Unable to save property. Check the slug and field values.",
@@ -383,7 +412,12 @@ export async function saveProperty(
     if (!saved && uploaded.length)
       await db.storage.from("property-images").remove(uploaded);
     if (created && propertyId && !saved)
-      await db.from("properties").delete().eq("id", propertyId);
+      await db
+        .from("properties")
+        .delete()
+        .eq("id", propertyId)
+        .select("id")
+        .single();
     return fail(e);
   }
 }
@@ -400,7 +434,12 @@ export async function deleteProperty(
       .select("images")
       .eq("id", propertyId)
       .single();
-    const { error } = await db.from("properties").delete().eq("id", propertyId);
+    const { error } = await db
+      .from("properties")
+      .delete()
+      .eq("id", propertyId)
+      .select("id")
+      .single();
     if (error) throw new Error("Unable to delete property");
     const prefix = db.storage
       .from("property-images")
@@ -413,6 +452,138 @@ export async function deleteProperty(
     if (paths.length) await db.storage.from("property-images").remove(paths);
     refresh();
     return { success: "Property deleted.", href: "/admin/properties" };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+export async function createLead(
+  _: ActionState,
+  f: FormData,
+): Promise<ActionState> {
+  const { db } = await requireStaff();
+  try {
+    if (!checked(f, "consent"))
+      throw new Error("Confirm contact permission before adding this lead.");
+    const { data, error } = await db
+      .from("leads")
+      .insert({
+        full_name: z.string().trim().min(2).max(120).parse(str(f, "full_name")),
+        email: emailSchema.parse(str(f, "email")),
+        phone: z.string().max(40).parse(str(f, "phone")),
+        source: "manual",
+        status: z.enum(leadStatuses).parse(str(f, "status")),
+        assigned_to: await assignment(db, f),
+        consent_at: new Date().toISOString(),
+        consent_text: "Contact permission confirmed by authorized staff.",
+      })
+      .select("id")
+      .single();
+    if (error)
+      throw new Error(
+        error.code === "23505"
+          ? "A lead with this email already exists. Search for the existing record."
+          : "Unable to create lead.",
+      );
+    refresh();
+    return { success: "Lead created.", href: "/admin/leads/" + data.id };
+  } catch (e) {
+    return fail(e);
+  }
+}
+export async function deleteLead(
+  _: ActionState,
+  f: FormData,
+): Promise<ActionState> {
+  const { db } = await requireStaff();
+  try {
+    if (!checked(f, "confirm")) throw new Error("Confirm deletion first.");
+    const { error } = await db
+      .from("leads")
+      .delete()
+      .eq("id", id(f))
+      .select("id")
+      .single();
+    if (error) throw new Error("Unable to delete lead.");
+    refresh();
+    return { success: "Lead deleted.", href: "/admin/leads" };
+  } catch (e) {
+    return fail(e);
+  }
+}
+export async function addInterest(
+  _: ActionState,
+  f: FormData,
+): Promise<ActionState> {
+  const { db } = await requireStaff();
+  try {
+    const { error } = await db
+      .from("lead_properties")
+      .upsert(
+        { lead_id: id(f, "lead_id"), property_id: id(f, "property_id") },
+        { onConflict: "lead_id,property_id" },
+      );
+    if (error) throw new Error("Unable to add property interest.");
+    refresh();
+    return { success: "Property interest saved." };
+  } catch (e) {
+    return fail(e);
+  }
+}
+export async function removeInterest(
+  _: ActionState,
+  f: FormData,
+): Promise<ActionState> {
+  const { db } = await requireStaff();
+  try {
+    const { error } = await db
+      .from("lead_properties")
+      .delete()
+      .eq("lead_id", id(f, "lead_id"))
+      .eq("property_id", id(f, "property_id"))
+      .select("property_id")
+      .single();
+    if (error) throw new Error("Unable to remove interest.");
+    refresh();
+    return { success: "Property interest removed." };
+  } catch (e) {
+    return fail(e);
+  }
+}
+export async function deleteNote(
+  _: ActionState,
+  f: FormData,
+): Promise<ActionState> {
+  const { db } = await requireStaff();
+  try {
+    const { error } = await db
+      .from("notes")
+      .delete()
+      .eq("id", id(f))
+      .select("id")
+      .single();
+    if (error) throw new Error("Unable to delete note.");
+    refresh();
+    return { success: "Note deleted." };
+  } catch (e) {
+    return fail(e);
+  }
+}
+export async function deleteTask(
+  _: ActionState,
+  f: FormData,
+): Promise<ActionState> {
+  const { db } = await requireStaff();
+  try {
+    const { error } = await db
+      .from("tasks")
+      .delete()
+      .eq("id", id(f))
+      .select("id")
+      .single();
+    if (error) throw new Error("Unable to delete task.");
+    refresh();
+    return { success: "Task deleted." };
   } catch (e) {
     return fail(e);
   }

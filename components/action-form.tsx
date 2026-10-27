@@ -1,5 +1,5 @@
 "use client";
-import { useActionState } from "react";
+import { startTransition, useActionState } from "react";
 export type ActionState = { error?: string; success?: string; href?: string };
 export function ActionForm({
   action,
@@ -14,7 +14,16 @@ export function ActionForm({
 }) {
   const [state, submit, pending] = useActionState(action, {});
   return (
-    <form action={submit} className={className}>
+    <form
+      action={submit}
+      className={className}
+      onSubmit={(event) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        // Manual dispatch preserves uncontrolled input values after validation errors.
+        startTransition(() => submit(data));
+      }}
+    >
       {children}
       {state.error && (
         <p className="error" role="alert">

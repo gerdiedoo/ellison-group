@@ -6,6 +6,8 @@ export default defineConfig({
   fullyParallel: true,
   workers: 2,
   use: {
+    actionTimeout: 15000,
+    navigationTimeout: 30000,
     baseURL: "http://localhost:3000",
     trace: "retain-on-failure",
     launchOptions: {

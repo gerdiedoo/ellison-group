@@ -1,3 +1,4 @@
+import { requestsHuman } from "@/lib/chat-handoff";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { privileged } from "@/lib/supabase/server";
@@ -90,7 +91,14 @@ export async function POST(request: Request) {
         sender: "assistant",
         body: config.assistant.welcome,
       });
-      if (me) throw new Error("Unable to initialize conversation");
+      if (me) {
+        await db
+          .from("conversations")
+          .delete()
+          .eq("id", c.id)
+          .eq("visitor_hash", hash);
+        throw new Error("Unable to initialize conversation");
+      }
       return NextResponse.json(await snapshot(c.id, hash));
     }
     if (input.action === "handoff" && !config.assistant.handoffEnabled)
@@ -100,7 +108,9 @@ export async function POST(request: Request) {
       p_id: input.id,
       p_hash: hash,
       p_body: input.body,
-      p_handoff: input.action === "handoff",
+      p_handoff:
+        input.action === "handoff" ||
+        (config.assistant.handoffEnabled && requestsHuman(input.body)),
     });
     if (error)
       throw new Error(
@@ -123,6 +133,9 @@ export async function POST(request: Request) {
         console.error(
           "Assistant request failed:",
           e instanceof Error ? e.name : "Unknown error",
+          typeof e === "object" && e !== null && "status" in e
+            ? Number(e.status)
+            : "no provider status",
         );
         reply = process.env.GOOGLE_GEMINI_API_KEY
           ? "The AI service is temporarily unavailable. Please request human assistance or contact our team."

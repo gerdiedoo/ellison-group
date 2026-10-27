@@ -17,6 +17,7 @@ export function Field({
       <label>
         {label}
         <input
+          aria-label={label}
           name={name}
           type={type}
           step={type === "number" ? "any" : undefined}
@@ -42,7 +43,12 @@ export function Area({
     <div className="field">
       <label>
         {label}
-        <textarea name={name} defaultValue={value} rows={rows} />
+        <textarea
+          aria-label={label}
+          name={name}
+          defaultValue={value}
+          rows={rows}
+        />
       </label>
     </div>
   );
@@ -62,7 +68,7 @@ export function Select({
     <div className="field">
       <label>
         {label}
-        <select name={name} defaultValue={value}>
+        <select aria-label={label} name={name} defaultValue={value}>
           {options.map((s) => (
             <option key={s} value={s}>
               {s}
@@ -84,7 +90,11 @@ export function Assignment({
     <div className="field">
       <label>
         Assigned agent
-        <select name="assigned_to" defaultValue={value || ""}>
+        <select
+          aria-label="Assigned agent"
+          name="assigned_to"
+          defaultValue={value || ""}
+        >
           <option value="">Unassigned</option>
           {team
             .filter((p) => p.active && p.role !== "visitor")

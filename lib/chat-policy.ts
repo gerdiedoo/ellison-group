@@ -42,7 +42,7 @@ export function factualReply(
     return `${company.name}\n${company.address}\n${company.phone}\nI do not have other verified company policies. Please ask our team for details.`;
   if (selection.intent === "valuation")
     return "Our team prepares home valuations personally. Visit /home-valuation to share your address and request one. I cannot estimate a price or confirm a valuation.";
-  if (!selected.length)
+  if (selection.intent === "unknown" || !selected.length)
     return "I don’t have verified information that answers that request in the current listing selection. You can adjust your search at /properties or contact our team for help.";
   return (
     (tone.toLowerCase().includes("concise")

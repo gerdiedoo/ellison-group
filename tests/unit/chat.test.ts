@@ -44,6 +44,16 @@ describe("grounded assistant output", () => {
     expect(result).not.toContain("Verified Home");
     expect(result).toContain("don’t have verified information");
   });
+  it("does not answer an unsupported question with unrelated valid records", () => {
+    const result = factualReply(
+      { intent: "unknown", propertyIds: [id] },
+      [p],
+      company,
+      true,
+    );
+    expect(result).toContain("don’t have verified information");
+    expect(result).not.toContain("$500,000");
+  });
   it("does not generate valuations", () =>
     expect(
       factualReply(

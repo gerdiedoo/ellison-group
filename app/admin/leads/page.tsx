@@ -1,3 +1,4 @@
+import { leadQuery, type LeadFilters } from "@/lib/crm-data";
 import { pageNumber } from "@/lib/validation";
 import Link from "next/link";
 import { requireStaff } from "@/lib/auth";
@@ -5,32 +6,17 @@ import { leadStatuses } from "@/lib/validation";
 export default async function Leads({
   searchParams,
 }: {
-  searchParams: Promise<{
-    q?: string;
-    status?: string;
-    agent?: string;
-    page?: string;
-  }>;
+  searchParams: Promise<LeadFilters>;
 }) {
   const p = await searchParams;
   const { db } = await requireStaff();
-  const { data: team } = await db
+  const { data: team, error: teamError } = await db
     .from("profiles")
     .select("*")
     .in("role", ["agent", "admin"])
     .eq("active", true);
-  let query = db
-    .from("leads")
-    .select("*", { count: "exact" })
-    .order("created_at", { ascending: false });
-  const q = (p.q || "").replace(/[%_,().]/g, " ").slice(0, 100);
-  if (q) query = query.or(`full_name.ilike.%${q}%,email.ilike.%${q}%`);
-  if (p.status) query = query.eq("status", p.status);
-  if (p.agent)
-    query =
-      p.agent === "unassigned"
-        ? query.is("assigned_to", null)
-        : query.eq("assigned_to", p.agent);
+  if (teamError) throw new Error("Unable to load team");
+  const query = leadQuery(db, p);
   const page = pageNumber(p.page);
   const {
     data: leads,
@@ -42,10 +28,23 @@ export default async function Leads({
     "/admin/leads?" + new URLSearchParams({ ...p, page: String(n) }).toString();
   return (
     <>
-      <h1>Leads</h1>
+      <div className="sec-head">
+        <h1>Leads</h1>
+        <div className="inline">
+          <Link className="btn solid" href="/admin/leads/new">
+            Create lead
+          </Link>
+          <a
+            className="btn ghost"
+            href={"/admin/leads/export?" + new URLSearchParams({ ...p })}
+          >
+            Export CSV
+          </a>
+        </div>
+      </div>
       <form className="toolbar">
         <div className="field">
-          <label htmlFor="q">Search name or email</label>
+          <label htmlFor="q">Search name, email or phone</label>
           <input id="q" name="q" defaultValue={p.q} />
         </div>
         <div className="field">
@@ -67,6 +66,27 @@ export default async function Leads({
                 {t.full_name}
               </option>
             ))}
+          </select>
+        </div>
+        <div className="field">
+          <label htmlFor="source">Source</label>
+          <select name="source" id="source" defaultValue={p.source}>
+            <option value="">All sources</option>
+            {["form", "chatbot", "manual", "google"].map((v) => (
+              <option key={v}>{v}</option>
+            ))}
+          </select>
+        </div>
+        <div className="field">
+          <label htmlFor="since">Created since (UTC)</label>
+          <input id="since" name="since" type="date" defaultValue={p.since} />
+        </div>
+        <div className="field">
+          <label htmlFor="sort">Sort</label>
+          <select name="sort" id="sort" defaultValue={p.sort}>
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="name">Name</option>
           </select>
         </div>
         <button className="btn solid">Apply</button>
