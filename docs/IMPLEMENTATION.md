@@ -39,3 +39,7 @@ Every uploaded file was reviewed and verified against the archive. See `PROTOTYP
 Manual lead creation, email editing, note/task/interest management, confirmed deletion and protected CSV export extend the existing CRM. Accessible form labels and retained input values make correction possible after rejected uploads. Updates confirm a row actually changed; dashboard counts fail visibly on database errors. Real browser and direct API tests use isolated temporary accounts and records.
 
 Gemini receives only published candidate records and selects structured IDs/intent. The server intersects those IDs with the candidate set, re-reads published records, and renders stored facts. Explicit human requests bypass the model; status/revision checks protect handoff and staff replies. SDK retries are disabled, a configured fallback is bounded, and provider errors produce a saved limitation message. The visitor widget and staff inbox share persistent messages and lead history. The local acceptance environment uses an available `gemini-3.5-flash` model; model IDs remain configurable.
+
+## Whole-application audit
+
+See `AUDIT.md` for the current master-requirement review, fixes, verification and external boundaries. The audit adds migration 006 for note attribution, inquiry detail routes, note edits, safer cross-service failure handling, authentication/route fixes and expanded live public-to-CRM acceptance. The source is verified; applying 006 to hosted Supabase remains a required deployment step and was explicitly found missing by the live probe.

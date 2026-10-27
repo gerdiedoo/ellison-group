@@ -1,5 +1,7 @@
+import { settings } from "@/lib/settings";
 export const metadata = { title: "Terms & conditions" };
-export default function Terms() {
+export default async function Terms() {
+  const { company } = await settings();
   return (
     <article className="wrap page legal-copy">
       <h1>Terms & conditions.</h1>
@@ -33,8 +35,7 @@ export default function Terms() {
       </p>
       <h2>Contact</h2>
       <p>
-        The Ellison Group, 12814 Cantrell Rd, Little Rock, AR 72223. (501)
-        725-1227.
+        {company.name}, {company.address}. {company.phone}.
       </p>
     </article>
   );

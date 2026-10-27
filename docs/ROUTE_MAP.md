@@ -21,6 +21,7 @@ Verified against the actual `app/` tree on October 27, 2026. Parenthesized route
 | `/admin/assistant`          | `app/admin/assistant/page.tsx`            | Administrator                                                   | Original admin.html#/assistant                                         |
 | `/admin/conversations/[id]` | `app/admin/conversations/[id]/page.tsx`   | Active agent or administrator                                   | Original admin.html#/conversations/:id                                 |
 | `/admin/conversations`      | `app/admin/conversations/page.tsx`        | Active agent or administrator                                   | Original admin.html#/conversations                                     |
+| `/admin/inquiries/[id]`     | `app/admin/inquiries/[id]/page.tsx`       | Active agent or administrator                                   | Persistent inquiry detail/status/assignment                            |
 | `/admin/inquiries`          | `app/admin/inquiries/page.tsx`            | Active agent or administrator                                   | Expanded original lead inquiry table                                   |
 | `/admin/lead-capture`       | `app/admin/lead-capture/page.tsx`         | Administrator                                                   | Original admin.html#/lead-capture                                      |
 | `/admin/leads/new`          | `app/admin/leads/new/page.tsx`            | Active agent or administrator                                   | Manual lead capture with confirmed contact permission                  |
@@ -63,18 +64,18 @@ Verified against the actual `app/` tree on October 27, 2026. Parenthesized route
 
 ## Database route dependencies and policy map
 
-| Table                                   | Anonymous                 | Authenticated visitor       | Active staff / administrator                                          | Main routes                          |
-| --------------------------------------- | ------------------------- | --------------------------- | --------------------------------------------------------------------- | ------------------------------------ |
-| `properties`                            | Published rows, read only | Published rows              | Staff CRUD; published/draft status enforced                           | Catalog/details; CRM properties      |
-| `profiles`                              | None                      | Own row, read only          | Staff read; admin update others; self-access changes blocked          | Login guards, assignments, team      |
-| `leads`, `inquiries`, `lead_properties` | None                      | None                        | Staff CRUD under RLS; public writes only through validated server RPC | Forms, CRM leads/inquiries           |
-| `notes`, `tasks`                        | None                      | None                        | Staff CRUD; note author checked on insert                             | Lead/conversation detail             |
-| `conversations`                         | None                      | None directly               | Staff management; public server endpoints require visitor cookie      | Chat and CRM inbox                   |
-| `messages`                              | None                      | None directly               | Staff read; replies only via staff-checked `agent_reply`              | Same persistent public/staff history |
-| `favorites`                             | None                      | Own read/insert/delete only | Still own-account scope                                               | Favorites and save actions           |
-| `settings`                              | None directly             | None                        | Staff read; admin update; safe selected settings rendered server-side | Public shell, admin configuration    |
-| `activity_logs`                         | None                      | None                        | Staff read only; trigger-generated writes                             | CRM activity/dashboard               |
-| `rate_limits`                           | None                      | None                        | No direct API access; service-only quota function                     | Public endpoint abuse controls       |
+| Table                                   | Anonymous                 | Authenticated visitor       | Active staff / administrator                                                             | Main routes                          |
+| --------------------------------------- | ------------------------- | --------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------ |
+| `properties`                            | Published rows, read only | Published rows              | Staff CRUD; published/draft status enforced                                              | Catalog/details; CRM properties      |
+| `profiles`                              | None                      | Own row, read only          | Staff read; admin update others; self-access changes blocked                             | Login guards, assignments, team      |
+| `leads`, `inquiries`, `lead_properties` | None                      | None                        | Staff CRUD under RLS; public writes only through validated server RPC                    | Forms, CRM leads/inquiries           |
+| `notes`, `tasks`                        | None                      | None                        | Staff CRUD; note author checked on insert; attribution/context immutable on update (006) | Lead/conversation detail             |
+| `conversations`                         | None                      | None directly               | Staff management; public server endpoints require visitor cookie                         | Chat and CRM inbox                   |
+| `messages`                              | None                      | None directly               | Staff read; replies only via staff-checked `agent_reply`                                 | Same persistent public/staff history |
+| `favorites`                             | None                      | Own read/insert/delete only | Still own-account scope                                                                  | Favorites and save actions           |
+| `settings`                              | None directly             | None                        | Staff read; admin update; safe selected settings rendered server-side                    | Public shell, admin configuration    |
+| `activity_logs`                         | None                      | None                        | Staff read only; trigger-generated writes                                                | CRM activity/dashboard               |
+| `rate_limits`                           | None                      | None                        | No direct API access; service-only quota function                                        | Public endpoint abuse controls       |
 
 Every application table has RLS enabled. Explicit API table grants exclude TRUNCATE/REFERENCES/TRIGGER, which normal row policies do not protect. The public `property-images` bucket is only for listing artwork/photos; valid staff property paths and allowed MIME/size policies guard writes. No private lead documents belong in that bucket.
 
@@ -85,5 +86,7 @@ Every application table has RLS enabled. Explicit API table grants exclude TRUNC
 3. `202610260003_integrity.sql`: active-staff assignments, serialized replies, context validation and FK indexes.
 4. `202610260004_conversation_search.sql`: staff-only persistent transcript search.
 5. `202610270005_foundation_permissions.sql`: explicit least-privilege API grants, protected audit sequence, service-role grants and visitor-only backfill for Auth accounts predating the app.
+
+6. `202610270006_note_attribution.sql`: immutable note authorship, creation time, identity and originating record; staff may edit text.
 
 Apply existing migrations plus new migrations; do not edit already-deployed historical migrations. Optional `supabase/seed-drafts.sql` imports the 16 historical properties as **unpublished** drafts and never seeds fake personal records. First administrator provisioning and environment/OAuth configuration are documented in README. The full current parity backlog is in `PROTOTYPE_INVENTORY.md`.

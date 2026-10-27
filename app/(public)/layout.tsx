@@ -91,13 +91,12 @@ export default async function PublicLayout({
           </div>
         </div>
       </footer>
-      {assistant.enabled && (
-        <ChatWidget
-          welcome={assistant.welcome}
-          handoffEnabled={assistant.handoffEnabled}
-          capture={capture}
-        />
-      )}
+      <ChatWidget
+        enabled={assistant.enabled}
+        welcome={assistant.welcome}
+        handoffEnabled={assistant.handoffEnabled}
+        capture={capture}
+      />
     </>
   );
 }

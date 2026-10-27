@@ -13,7 +13,8 @@
     "test:db": "bash tests/database/run.sh",
     "verify:prototype": "node scripts/verify-prototype.mjs",
     "db:types": "node scripts/generate-database-types.mjs",
-    "import:prototype": "node scripts/import-prototype.mjs"
+    "import:prototype": "node scripts/import-prototype.mjs",
+    "audit:hosted-notes": "node --env-file-if-exists=.env.local scripts/audit-note-attribution.mjs"
   },
   "dependencies": {
     "next": "16.4.3",

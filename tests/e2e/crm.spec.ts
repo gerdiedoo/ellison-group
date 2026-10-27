@@ -1,3 +1,4 @@
+import { testIngress } from "./ingress";
 import type { Database } from "../../lib/database.types";
 import { test, expect, type Page, type Locator } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
@@ -103,9 +104,7 @@ test("protected CRM workflows and direct API permissions", async ({
     const anon = createClient<Database>(url, key, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    await page.context().setExtraHTTPHeaders({
-      "x-real-ip": `192.0.2.${1 + (parseInt(token.slice(0, 2), 16) % 250)}`,
-    });
+    await testIngress(page, token);
     await page.goto("/login?next=/admin");
     await page.getByLabel("Email", { exact: true }).fill(admin.email);
     await page.getByLabel("Password", { exact: true }).fill(admin.password);
@@ -249,7 +248,7 @@ test("protected CRM workflows and direct API permissions", async ({
       page.getByRole("button", { name: "Add note", exact: true }),
     );
     await expect(
-      page.getByText("Private note " + token, { exact: true }),
+      page.locator("p").filter({ hasText: "Private note " + token }),
     ).toBeVisible();
     const note = await owner
       .from("notes")
@@ -258,6 +257,25 @@ test("protected CRM workflows and direct API permissions", async ({
       .single();
     must(note.error);
     expect(note.data?.author_id).toBe(admin.id);
+    await page
+      .getByLabel("Edit note", { exact: true })
+      .fill("Corrected private note " + token);
+    await submit(
+      page,
+      page.getByRole("button", { name: "Save note", exact: true }),
+    );
+    expect(
+      (
+        await owner
+          .from("notes")
+          .select("body,author_id")
+          .eq("id", note.data!.id)
+          .single()
+      ).data,
+    ).toMatchObject({
+      body: "Corrected private note " + token,
+      author_id: admin.id,
+    });
     await page.getByLabel("Task", { exact: true }).fill("Follow up " + token);
     await page.getByLabel("Due date (Central time)").fill("2030-12-01");
     await submit(
@@ -587,6 +605,16 @@ test("protected CRM workflows and direct API permissions", async ({
       .select("id")
       .single();
     must(ownNote.error);
+    must(
+      (
+        await sessions.agent.db
+          .from("notes")
+          .update({ body: "Corrected direct agent note" })
+          .eq("id", ownNote.data!.id)
+          .select("id")
+          .single()
+      ).error,
+    );
     must(
       (
         await sessions.agent.db

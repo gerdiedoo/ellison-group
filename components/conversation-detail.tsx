@@ -1,3 +1,4 @@
+import { isRecordId } from "@/lib/validation";
 import Link from "next/link";
 import { requireStaff } from "@/lib/auth";
 import { notFound } from "next/navigation";
@@ -8,14 +9,17 @@ import {
   updateConversation,
   replyConversation,
   addNote,
+  updateNote,
+  deleteNote,
 } from "@/app/actions/crm";
 export async function ConversationDetail({ id }: { id: string }) {
   const { db } = await requireStaff();
+  if (!isRecordId(id)) notFound();
   const [
     { data: c, error },
     { data: messages, error: me },
-    { data: team },
-    { data: notes },
+    { data: team, error: teamError },
+    { data: notes, error: notesError },
   ] = await Promise.all([
     db.from("conversations").select("*").eq("id", id).maybeSingle(),
     db
@@ -31,7 +35,8 @@ export async function ConversationDetail({ id }: { id: string }) {
       .eq("conversation_id", id)
       .order("created_at", { ascending: false }),
   ]);
-  if (error || me) throw new Error("Unable to load conversation");
+  if (error || me || teamError || notesError)
+    throw new Error("Unable to load conversation");
   if (!c) notFound();
   return (
     <>
@@ -89,9 +94,16 @@ export async function ConversationDetail({ id }: { id: string }) {
           <div className="card">
             <h2>Internal notes</h2>
             {notes?.map((n) => (
-              <p className="notice" key={n.id}>
-                {n.body}
-              </p>
+              <div className="notice" key={n.id}>
+                <p>{n.body}</p>
+                <ActionForm action={updateNote} label="Save note">
+                  <input type="hidden" name="id" value={n.id} />
+                  <Area name="body" label="Edit note" value={n.body} />
+                </ActionForm>
+                <ActionForm action={deleteNote} label="Delete note">
+                  <input type="hidden" name="id" value={n.id} />
+                </ActionForm>
+              </div>
             ))}
             <ActionForm action={addNote} label="Add note">
               <input type="hidden" name="conversation_id" value={id} />

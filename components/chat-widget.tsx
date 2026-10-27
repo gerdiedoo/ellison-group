@@ -12,10 +12,12 @@ export function ChatWidget({
   welcome,
   handoffEnabled,
   capture,
+  enabled = true,
 }: {
   welcome: string;
   handoffEnabled: boolean;
   capture: CaptureConfig;
+  enabled?: boolean;
 }) {
   const [open, setOpen] = useState(false),
     [chat, setChat] = useState<Chat | null>(null),
@@ -41,7 +43,8 @@ export function ChatWidget({
     return () => window.removeEventListener("eg-chat-open", onProperty);
   }, []);
   useEffect(() => {
-    if (!open) return;
+    // Existing human conversations remain accessible when automated chat is disabled.
+    if (!open && enabled) return;
     const id = localStorage.getItem("eg_conversation_id");
     if (!id) return;
     let active = true;
@@ -51,6 +54,7 @@ export function ChatWidget({
           cache: "no-store",
         });
         if (res.status === 404) {
+          clearInterval(t);
           localStorage.removeItem("eg_conversation_id");
           if (active) setChat(null);
           return;
@@ -65,13 +69,13 @@ export function ChatWidget({
         if (active) setError("Conversation refresh failed. Please try again.");
       }
     }
-    void poll();
     const t = setInterval(poll, 5000);
+    void poll();
     return () => {
       active = false;
       clearInterval(t);
     };
-  }, [open, chat?.id]);
+  }, [open, chat?.id, enabled]);
   useEffect(() => {
     bottom.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [chat?.messages.length]);
@@ -102,16 +106,18 @@ export function ChatWidget({
       setPending(false);
     }
   }
+  if (!enabled && !chat) return null;
   return (
     <>
       <button
         className="chat-launch inline"
+        aria-label="Your real estate assistant"
         aria-expanded={open}
         aria-controls="chat-panel"
         onClick={() => setOpen(!open)}
       >
         <MessageCircle size={20} />
-        Your real estate assistant
+        <span className="chat-label">Your real estate assistant</span>
       </button>
       {open && (
         <aside
@@ -239,7 +245,7 @@ export function ChatWidget({
                         Share contact details
                       </button>
                     )}
-                    {chat.status === "resolved" && (
+                    {chat.status === "resolved" && enabled && (
                       <button
                         className="text-button"
                         disabled={pending}
@@ -249,27 +255,34 @@ export function ChatWidget({
                       </button>
                     )}
                   </div>
-                  {chat.status !== "resolved" && (
-                    <form
-                      className="chat-form"
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        if (text.trim()) void send("message", text);
-                      }}
-                    >
-                      <input
-                        aria-label="Your message"
-                        maxLength={2000}
-                        value={text}
-                        onChange={(e) => setText(e.target.value)}
-                        required
-                        disabled={pending}
-                      />
-                      <button disabled={pending || !text.trim()}>
-                        {pending ? "Sending…" : "Send"}
-                      </button>
-                    </form>
+                  {!enabled && chat.status === "bot" && (
+                    <p className="notice">
+                      The AI assistant is paused. Request human assistance or
+                      contact our team.
+                    </p>
                   )}
+                  {chat.status !== "resolved" &&
+                    (enabled || chat.status === "human") && (
+                      <form
+                        className="chat-form"
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          if (text.trim()) void send("message", text);
+                        }}
+                      >
+                        <input
+                          aria-label="Your message"
+                          maxLength={2000}
+                          value={text}
+                          onChange={(e) => setText(e.target.value)}
+                          required
+                          disabled={pending}
+                        />
+                        <button disabled={pending || !text.trim()}>
+                          {pending ? "Sending…" : "Send"}
+                        </button>
+                      </form>
+                    )}
                 </>
               )}
             </>

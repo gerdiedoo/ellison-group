@@ -1,3 +1,4 @@
+import { testIngress } from "./ingress";
 import { test, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "../../lib/database.types";
@@ -33,12 +34,10 @@ test("grounded Gemini conversation, lead capture and staff-controlled handoff", 
   const propertyIds: string[] = [];
   const staffContext = await browser.newContext();
   const outsider = await browser.newContext();
-  const headers = { origin: "http://localhost:3000" };
-  await page
-    .context()
-    .setExtraHTTPHeaders({
-      "x-real-ip": `198.51.100.${1 + (parseInt(token.slice(0, 2), 16) % 250)}`,
-    });
+  const headers = {
+    origin: "http://localhost:3000",
+    ...(await testIngress(page, token, "198.51.100")),
+  };
   try {
     const user = await owner.auth.admin.createUser({
       email,

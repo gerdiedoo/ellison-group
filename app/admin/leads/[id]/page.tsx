@@ -1,3 +1,4 @@
+import { isRecordId } from "@/lib/validation";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { requireStaff } from "@/lib/auth";
@@ -12,6 +13,7 @@ import {
   addInterest,
   removeInterest,
   deleteNote,
+  updateNote,
   deleteTask,
 } from "@/app/actions/crm";
 import { leadStatuses } from "@/lib/validation";
@@ -21,6 +23,7 @@ export default async function LeadDetail({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  if (!isRecordId(id)) notFound();
   const { db } = await requireStaff();
   const [lr, team, notes, tasks, inquiries, interests, activity] =
     await Promise.all([
@@ -54,7 +57,7 @@ export default async function LeadDetail({
     throw new Error("Unable to load lead");
   const l = lr.data;
   if (!l) notFound();
-  const { data: properties } = interests.data?.length
+  const { data: properties, error: propertiesError } = interests.data?.length
     ? await db
         .from("properties")
         .select("id,address")
@@ -62,11 +65,13 @@ export default async function LeadDetail({
           "id",
           interests.data.map((i) => i.property_id),
         )
-    : { data: [] };
-  const { data: allProperties } = await db
+    : { data: [], error: null };
+  const { data: allProperties, error: allPropertiesError } = await db
     .from("properties")
     .select("id,address")
     .order("address");
+  if (propertiesError || allPropertiesError)
+    throw new Error("Unable to load lead properties");
   return (
     <>
       <Link className="link" href="/admin/leads">
@@ -150,6 +155,10 @@ export default async function LeadDetail({
                   timeZone: "America/Chicago",
                 })}
               </small>
+              <ActionForm action={updateNote} label="Save note">
+                <input type="hidden" name="id" value={n.id} />
+                <Area name="body" label="Edit note" value={n.body} />
+              </ActionForm>
               <ActionForm action={deleteNote} label="Delete note">
                 <input type="hidden" name="id" value={n.id} />
               </ActionForm>
@@ -206,7 +215,7 @@ export default async function LeadDetail({
       <h2>Inquiry history</h2>
       {inquiries.data?.map((i) => (
         <div className="notice" key={i.id}>
-          <Link className="link" href={"/admin/inquiries#" + i.id}>
+          <Link className="link" href={"/admin/inquiries/" + i.id}>
             {i.kind} · {i.status}
           </Link>
           <p>{i.message}</p>

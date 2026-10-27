@@ -11,6 +11,7 @@ import {
 import { settings } from "@/lib/settings";
 import { assistantReply } from "@/lib/gemini";
 export const maxDuration = 60;
+const privateHeaders = { "Cache-Control": "private, no-store" };
 const schema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("start"), propertyId: z.uuid().optional() }),
   z.object({
@@ -99,7 +100,9 @@ export async function POST(request: Request) {
           .eq("visitor_hash", hash);
         throw new Error("Unable to initialize conversation");
       }
-      return NextResponse.json(await snapshot(c.id, hash));
+      return NextResponse.json(await snapshot(c.id, hash), {
+        headers: privateHeaders,
+      });
     }
     if (input.action === "handoff" && !config.assistant.handoffEnabled)
       throw new Error("Please use the contact page to reach our team.");
@@ -152,7 +155,9 @@ export async function POST(request: Request) {
           "Unable to save the assistant reply. Please retry later.",
         );
     }
-    return NextResponse.json(await snapshot(input.id, hash));
+    return NextResponse.json(await snapshot(input.id, hash), {
+      headers: privateHeaders,
+    });
   } catch (e) {
     return NextResponse.json(
       {

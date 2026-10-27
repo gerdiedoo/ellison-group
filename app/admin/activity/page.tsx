@@ -1,3 +1,4 @@
+import { queryValues } from "@/lib/validation";
 import { pageNumber } from "@/lib/validation";
 import Link from "next/link";
 import { requireStaff } from "@/lib/auth";
@@ -6,7 +7,7 @@ export default async function Activity({
 }: {
   searchParams: Promise<{ entity?: string; action?: string; page?: string }>;
 }) {
-  const p = await searchParams;
+  const p = queryValues(await searchParams);
   const { db } = await requireStaff();
   let q = db
     .from("activity_logs")

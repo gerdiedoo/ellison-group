@@ -1,3 +1,4 @@
+import { queryValues } from "@/lib/validation";
 import { InquiryForm } from "@/components/inquiry-form";
 import { settings } from "@/lib/settings";
 export const metadata = { title: "Home valuation" };
@@ -6,7 +7,10 @@ export default async function Valuation({
 }: {
   searchParams: Promise<{ address?: string }>;
 }) {
-  const initialAddress = ((await searchParams).address || "").slice(0, 300);
+  const initialAddress = (queryValues(await searchParams).address || "").slice(
+    0,
+    300,
+  );
   const { capture } = await settings();
   return (
     <div className="wrap page two-cols">

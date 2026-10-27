@@ -1,3 +1,4 @@
+import { queryValues, isRecordId } from "@/lib/validation";
 import { pageNumber } from "@/lib/validation";
 import Link from "next/link";
 import { requireStaff } from "@/lib/auth";
@@ -12,14 +13,18 @@ export default async function Inbox({
     page?: string;
   }>;
 }) {
-  const p = await searchParams;
+  const p = queryValues(await searchParams);
   const { db } = await requireStaff();
   let q = db
-    .rpc("search_conversations", { p_query: (p.q || "").slice(0, 100) }, {count:"exact"})
+    .rpc(
+      "search_conversations",
+      { p_query: (p.q || "").slice(0, 100) },
+      { count: "exact" },
+    )
     .select("id,status,assigned_to,lead_id,updated_at")
     .order("updated_at", { ascending: false });
   if (p.status) q = q.eq("status", p.status as "bot" | "human" | "resolved");
-  if (p.agent)
+  if (p.agent === "unassigned" || isRecordId(p.agent))
     q =
       p.agent === "unassigned"
         ? q.is("assigned_to", null)
@@ -27,14 +32,33 @@ export default async function Inbox({
   const page = pageNumber(p.page);
   const [
     { data: conversations, count, error },
-    { data: team },
-    { data: leads },
+    { data: team, error: teamError },
   ] = await Promise.all([
     q.range((page - 1) * 50, page * 50 - 1),
     db.from("profiles").select("*").in("role", ["agent", "admin"]),
-    db.from("leads").select("id,full_name").limit(10000),
   ]);
-  if (error) throw new Error("Unable to load inbox");
+  if (error || teamError) throw new Error("Unable to load inbox");
+  const leadIds = [
+    ...new Set(
+      conversations?.flatMap((c) => (c.lead_id ? [c.lead_id] : [])) || [],
+    ),
+  ];
+  const agentIds = [
+    ...new Set(
+      conversations?.flatMap((c) => (c.assigned_to ? [c.assigned_to] : [])) ||
+        [],
+    ),
+  ];
+  const [leads, agents] = await Promise.all([
+    leadIds.length
+      ? db.from("leads").select("id,full_name").in("id", leadIds)
+      : Promise.resolve({ data: [], error: null }),
+    agentIds.length
+      ? db.from("profiles").select("id,full_name").in("id", agentIds)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+  if (leads.error || agents.error)
+    throw new Error("Unable to load inbox contacts");
   const url = (n: number) =>
     "/admin/conversations?" + new URLSearchParams({ ...p, page: String(n) });
   return (
@@ -79,11 +103,11 @@ export default async function Inbox({
           >
             <span className="badge">{c.status}</span>
             <h2>
-              {leads?.find((l) => l.id === c.lead_id)?.full_name ||
+              {leads.data?.find((l) => l.id === c.lead_id)?.full_name ||
                 "Anonymous visitor"}
             </h2>
             <p>
-              {team?.find((t) => t.id === c.assigned_to)?.full_name ||
+              {agents.data?.find((a) => a.id === c.assigned_to)?.full_name ||
                 "Unassigned"}{" "}
               · Updated {c.updated_at}
             </p>

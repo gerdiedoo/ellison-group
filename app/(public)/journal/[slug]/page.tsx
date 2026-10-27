@@ -22,15 +22,16 @@ export default async function Article({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const a = articles[(await params).slug];
-  if (!a) notFound();
+  const { slug } = await params;
+  if (!Object.hasOwn(articles, slug)) notFound();
+  const a = articles[slug];
   return (
     <article className="wrap page legal-copy">
       <span className="eyebrow">Little Rock, noted</span>
       <h1>{a.title}</h1>
       <p className="notice">
-        From the prototype journal. Event details and dates need editorial
-        verification before relying on them for travel plans.
+        Confirm current event details and dates with the organizer before making
+        travel plans.
       </p>
       <p>{a.body}</p>
       <Link className="btn solid" href="/contact">

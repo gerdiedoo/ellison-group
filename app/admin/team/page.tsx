@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { queryValues, pageNumber } from "@/lib/validation";
 import { requireStaff } from "@/lib/auth";
 import { ActionForm } from "@/components/action-form";
 import { Field, Select, Check } from "@/lib/admin-fields";
@@ -5,21 +7,28 @@ import { updateProfile } from "@/app/actions/crm";
 export default async function Team({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; page?: string }>;
 }) {
-  const p = await searchParams;
+  const p = queryValues(await searchParams);
   const { db, user } = await requireStaff(true);
+  const page = pageNumber(p.page);
   let q = db
     .from("profiles")
-    .select("*")
+    .select("*", { count: "exact" })
     .order("created_at", { ascending: false })
-    .limit(100);
+    .order("id");
   if (p.q)
     q = q.ilike(
       "full_name",
       "%" + p.q.replace(/[%_]/g, "").slice(0, 100) + "%",
     );
-  const { data: team, error } = await q;
+  const {
+    data: team,
+    error,
+    count,
+  } = await q.range((page - 1) * 50, page * 50 - 1);
+  const url = (n: number) =>
+    "/admin/team?" + new URLSearchParams({ ...p, page: String(n) });
   if (error) throw new Error("Unable to load team");
   return (
     <>
@@ -27,7 +36,7 @@ export default async function Team({
       <p>
         Create accounts using Supabase Auth (invite user), then assign roles
         here. New accounts start as visitors. No user may change their own
-        access. Showing up to 100 matching profiles.
+        access. Profiles are shown in pages of 50.
       </p>
       <form className="toolbar">
         <div className="field">
@@ -36,6 +45,7 @@ export default async function Team({
         </div>
         <button className="btn">Search</button>
       </form>
+      <p>{count} matching profiles</p>
       <div className="grid">
         {team?.map((t) => (
           <div className="card" key={t.id}>
@@ -64,6 +74,19 @@ export default async function Team({
           </div>
         ))}
       </div>
+      {!team?.length && <p className="empty">No profiles match this search.</p>}
+      <nav className="toolbar" aria-label="Team pagination">
+        {page > 1 && (
+          <Link className="btn" href={url(page - 1)}>
+            Previous
+          </Link>
+        )}
+        {page * 50 < (count || 0) && (
+          <Link className="btn" href={url(page + 1)}>
+            Next
+          </Link>
+        )}
+      </nav>
     </>
   );
 }

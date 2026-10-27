@@ -1,3 +1,4 @@
+import { isRecordId } from "@/lib/validation";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireStaff } from "@/lib/auth";
@@ -9,11 +10,13 @@ export default async function EditProperty({
 }) {
   const { db } = await requireStaff();
   const { id } = await params;
-  const [{ data: p, error }, { data: team }] = await Promise.all([
-    db.from("properties").select("*").eq("id", id).maybeSingle(),
-    db.from("profiles").select("*").in("role", ["agent", "admin"]),
-  ]);
-  if (error) throw new Error("Unable to load property");
+  if (!isRecordId(id)) notFound();
+  const [{ data: p, error }, { data: team, error: teamError }] =
+    await Promise.all([
+      db.from("properties").select("*").eq("id", id).maybeSingle(),
+      db.from("profiles").select("*").in("role", ["agent", "admin"]),
+    ]);
+  if (error || teamError) throw new Error("Unable to load property");
   if (!p) notFound();
   return (
     <>

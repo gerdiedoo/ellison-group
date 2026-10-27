@@ -172,3 +172,16 @@ export function pageNumber(value: unknown) {
   const n = Number(value);
   return Number.isFinite(n) ? Math.max(1, Math.min(10000, Math.floor(n))) : 1;
 }
+
+// App Router query parameters may contain repeated values. Never treat an array
+// as a string or coerce attacker-controlled objects into database filters.
+export function queryValues(input: Record<string, unknown>) {
+  return Object.fromEntries(
+    Object.entries(input).flatMap(([key, raw]) => {
+      const value = Array.isArray(raw) ? raw[0] : raw;
+      return typeof value === "string" ? [[key, value]] : [];
+    }),
+  );
+}
+export const isRecordId = (value: unknown): value is string =>
+  z.uuid().safeParse(value).success;

@@ -1,3 +1,4 @@
+import { isRecordId } from "@/lib/validation";
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
@@ -21,7 +22,7 @@ export function leadQuery(db: SupabaseClient<Database>, p: LeadFilters) {
       `full_name.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%`,
     );
   if (p.status) query = query.eq("status", p.status);
-  if (p.agent)
+  if (p.agent === "unassigned" || isRecordId(p.agent))
     query =
       p.agent === "unassigned"
         ? query.is("assigned_to", null)

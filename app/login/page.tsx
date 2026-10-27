@@ -1,3 +1,4 @@
+import { queryValues } from "@/lib/validation";
 import { SubmitButton } from "@/components/submit-button";
 import { signIn, googleSignIn } from "@/app/actions/auth";
 import Link from "next/link";
@@ -7,7 +8,7 @@ export default async function Login({
 }: {
   searchParams: Promise<{ error?: string; next?: string }>;
 }) {
-  const p = await searchParams;
+  const p = queryValues(await searchParams);
   return (
     <main className="wrap page" style={{ maxWidth: 600 }}>
       <Link href="/" className="eyebrow">

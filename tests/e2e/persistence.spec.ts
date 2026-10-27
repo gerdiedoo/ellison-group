@@ -1,3 +1,4 @@
+import { testIngress } from "./ingress";
 import { test, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
 import { randomUUID, randomBytes } from "node:crypto";
@@ -21,9 +22,7 @@ test("public catalog, favorites and all lead forms persist to Supabase", async (
     password = randomBytes(24).toString("hex");
   // Emulate this local test ingress's client-IP header with a reserved test address.
   // Production ingress must replace client-supplied forwarding headers.
-  await page.context().setExtraHTTPHeaders({
-    "x-real-ip": `192.0.2.${1 + (parseInt(token.slice(0, 2), 16) % 250)}`,
-  });
+  await testIngress(page, token);
   let userId: string | undefined;
   let imagePath: string | undefined;
   const ids: string[] = [];
@@ -165,6 +164,12 @@ test("public catalog, favorites and all lead forms persist to Supabase", async (
     await expect(
       page.getByRole("heading", { name: "Thank you." }),
     ).toBeVisible();
+    await page.goto("/newsletter");
+    await details();
+    await page.getByRole("button", { name: "Send request" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Thank you." }),
+    ).toBeVisible();
     const leads = await db.from("leads").select("id").eq("email", email);
     must(leads.error);
     expect(leads.data).toHaveLength(1);
@@ -173,7 +178,7 @@ test("public catalog, favorites and all lead forms persist to Supabase", async (
       .select("kind,context,property_id")
       .eq("lead_id", leads.data![0].id);
     must(inquiries.error);
-    expect(inquiries.data).toHaveLength(4);
+    expect(inquiries.data).toHaveLength(5);
     expect(
       inquiries.data!.find((i) => i.kind === "Showing request")?.context,
     ).toMatchObject({
@@ -191,6 +196,51 @@ test("public catalog, favorites and all lead forms persist to Supabase", async (
         .getByRole("main")
         .getByRole("link", { name: "Sign in", exact: true }),
     ).toBeVisible();
+    // Provision only this temporary account as staff to follow the same public
+    // inquiry through the protected CRM. No existing profile is changed.
+    must(
+      (await db.from("profiles").update({ role: "agent" }).eq("id", userId!))
+        .error,
+    );
+    await page.goto("/login?next=/admin");
+    await page.getByLabel("Email", { exact: true }).fill(email);
+    await page.getByLabel("Password", { exact: true }).fill(password);
+    await page.getByRole("button", { name: "Sign in", exact: true }).click();
+    await expect(page).toHaveURL("http://localhost:3000/admin");
+    await page.goto("/admin/leads/" + leads.data![0].id);
+    await expect(
+      page.getByRole("heading", { name: "Automated Acceptance", exact: true }),
+    ).toBeVisible();
+    await page
+      .getByRole("link", { name: "Showing request · New", exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/admin\/inquiries\/[0-9a-f-]+$/);
+    await page.getByLabel("Status", { exact: true }).selectOption("Responded");
+    await page
+      .getByRole("button", { name: "Save changes", exact: true })
+      .click();
+    await expect(page.getByRole("status")).toContainText("Inquiry updated");
+    expect(
+      (
+        await db
+          .from("inquiries")
+          .select("status")
+          .eq("lead_id", leads.data![0].id)
+          .eq("kind", "Showing request")
+          .single()
+      ).data?.status,
+    ).toBe("Responded");
+    for (const record of [
+      "leads",
+      "properties",
+      "conversations",
+      "inquiries",
+    ]) {
+      await page.goto("/admin/" + record + "/not-a-record-id");
+      await expect(
+        page.getByRole("heading", { name: "Record unavailable." }),
+      ).toBeVisible();
+    }
   } finally {
     if (imagePath) {
       const removed = await db.storage

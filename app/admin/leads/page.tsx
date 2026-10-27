@@ -1,3 +1,4 @@
+import { queryValues } from "@/lib/validation";
 import { leadQuery, type LeadFilters } from "@/lib/crm-data";
 import { pageNumber } from "@/lib/validation";
 import Link from "next/link";
@@ -8,7 +9,7 @@ export default async function Leads({
 }: {
   searchParams: Promise<LeadFilters>;
 }) {
-  const p = await searchParams;
+  const p = queryValues(await searchParams);
   const { db } = await requireStaff();
   const { data: team, error: teamError } = await db
     .from("profiles")

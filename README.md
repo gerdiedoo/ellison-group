@@ -47,7 +47,7 @@ supabase db push
 
 Alternatively, execute the SQL files in `supabase/migrations/` in filename order in the Supabase SQL Editor. Never apply `tests/database/bootstrap.sql` to a Supabase project; it is exclusively an isolated test harness.
 
-Apply all five migrations, including `202610270005_foundation_permissions.sql` for explicit API grants and pre-existing account profiles. The migrations create the schema, indexes, constraints, role checks, public-capture/chat RPCs, RLS policies, immutable application audit log, aggregated reports and a public `property-images` bucket with MIME/path/size restrictions. No production listings or fake private CRM records are installed.
+Apply all six migrations, including `202610270005_foundation_permissions.sql` for explicit API grants and pre-existing account profiles, and `202610270006_note_attribution.sql` to prevent changes to note authorship/context while permitting text edits. The migrations create the schema, indexes, constraints, role checks, public-capture/chat RPCs, RLS policies, immutable application audit log, aggregated reports and a public `property-images` bucket with MIME/path/size restrictions. No production listings or fake private CRM records are installed.
 
 Optional reference import: run `supabase/seed-drafts.sql` manually to import the prototype's 16 historical listings as **unpublished drafts**. Verify their addresses, prices, status, agent and copy; upload photography; then publish through the CRM. The seed is not enabled automatically and is idempotent by slug. Illustrations are always labeled as such.
 
@@ -152,3 +152,17 @@ npx playwright test --workers=1
 ```
 
 Fixture cleanup removes only records created by the tests; server-generated audit events remain immutable. Provider quotas/outages can cause the real-Gemini assertions to fail; the application must show an explicit unavailable response and still allow handoff. Google consent and deployment callbacks require separate acceptance.
+
+## Audit follow-up — October 27, 2026
+
+See `docs/AUDIT.md` for the master-requirement review and exact verification boundaries. Apply migration **006** through the SQL Editor or your configured Supabase CLI before deploying these changes. The configured hosted project was probed with temporary staff/lead/note fixtures: existing-note author changes were still permitted there. A service-role API key cannot execute SQL DDL, and no database connection URL is configured in this workspace. The new guard is verified in isolated PostgreSQL; hosted enforcement must be rechecked after applying the migration. No additional application environment variables are needed.
+
+Inquiry history now links to `/admin/inquiries/[id]`, which remains usable regardless of list pagination. Notes can be edited and deleted from both lead and conversation detail. Storage errors retain the property row and are displayed; database and Storage operations are separate systems, so an error between successful file removal and the final database write can require a retry. Auth failures retain safe return destinations; the Google provider is enabled on the configured project, but interactive consent and production callbacks still require deployment verification.
+
+After applying migration 006, verify the actual hosted rule with:
+
+```sh
+npm run audit:hosted-notes
+```
+
+This command creates and deletes only marked temporary fixture accounts, a lead and a note. It exits 1 if an active agent can change the existing note’s author. No existing profile is promoted and no email invitations are sent.

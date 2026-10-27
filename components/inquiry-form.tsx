@@ -1,6 +1,8 @@
 "use client";
 import { useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { SubmitButton } from "@/components/submit-button";
 import { googleSignIn } from "@/app/actions/auth";
 import { consentText } from "@/lib/validation";
 export type CaptureConfig = {
@@ -29,6 +31,7 @@ export function InquiryForm({
   onSuccess?: () => void;
   initialAddress?: string;
 }) {
+  const pathname = usePathname();
   const [step, setStep] = useState(1),
     [status, setStatus] = useState(""),
     [pending, setPending] = useState(false),
@@ -320,8 +323,13 @@ export function InquiryForm({
       </form>
       {config.googleEnabled && config.googleConfigured && (
         <form action={googleSignIn} style={{ marginTop: 16 }}>
-          <input type="hidden" name="next" value="/contact" />
-          <button className="btn ghost">Continue with Google</button>
+          <input type="hidden" name="next" value={pathname} />
+          <SubmitButton
+            className="btn ghost"
+            pendingLabel="Connecting to Google…"
+          >
+            Continue with Google
+          </SubmitButton>
           <p className="policy">
             After sign-in, submit your request with contact details and consent.
           </p>

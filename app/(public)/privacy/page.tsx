@@ -1,6 +1,8 @@
+import { settings } from "@/lib/settings";
 import Link from "next/link";
 export const metadata = { title: "Privacy policy" };
-export default function Privacy() {
+export default async function Privacy() {
+  const { company } = await settings();
   return (
     <article className="wrap page legal-copy">
       <h1>Privacy policy.</h1>
@@ -46,7 +48,7 @@ export default function Privacy() {
       </p>
       <h2>Contact</h2>
       <p>
-        Call (501) 725-1227 or use our{" "}
+        Call {company.phone} or use our{" "}
         <Link className="link" href="/contact">
           contact form
         </Link>{" "}

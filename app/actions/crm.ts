@@ -11,6 +11,7 @@ import {
   captureSettingsSchema,
   companySchema,
 } from "@/lib/validation";
+import { removePropertyPhotos } from "@/lib/property-storage";
 import type { ActionState } from "@/components/action-form";
 const id = (f: FormData, key = "id") => z.uuid().parse(f.get(key));
 const str = (f: FormData, key: string) => String(f.get(key) || "").trim();
@@ -349,7 +350,11 @@ export async function saveProperty(
       if (error || !p) throw new Error("Property not found");
       images = p.images;
     }
-    const remove = f.getAll("remove_images").map(String);
+    // Only remove persisted images belonging to this listing, not forged form URLs.
+    const remove = f
+      .getAll("remove_images")
+      .map(String)
+      .filter((url) => images.includes(url));
     images = images.filter((url) => !remove.includes(url));
     if (created) {
       const { error } = await db
@@ -383,6 +388,7 @@ export async function saveProperty(
     }
     if (images.length > 40)
       throw new Error("A listing supports at most 40 photos.");
+    if (remove.length) await removePropertyPhotos(db, propertyId, remove);
     const { error } = await db
       .from("properties")
       .update({ ...patch, images })
@@ -394,15 +400,6 @@ export async function saveProperty(
         "Unable to save property. Check the slug and field values.",
       );
     saved = true;
-    if (remove.length) {
-      const prefix = db.storage
-        .from("property-images")
-        .getPublicUrl(`properties/${propertyId}/`).data.publicUrl;
-      const paths = remove
-        .filter((url) => url.startsWith(prefix))
-        .map((url) => `properties/${propertyId}/` + url.slice(prefix.length));
-      if (paths.length) await db.storage.from("property-images").remove(paths);
-    }
     refresh();
     return {
       success: "Property saved.",
@@ -429,11 +426,14 @@ export async function deleteProperty(
   try {
     if (!checked(f, "confirm")) throw new Error("Confirm deletion first.");
     const propertyId = id(f);
-    const { data: p } = await db
+    const { data: p, error: readError } = await db
       .from("properties")
       .select("images")
       .eq("id", propertyId)
       .single();
+    if (readError || !p) throw new Error("Property not found.");
+    // Retain the database row if Storage rejects cleanup so staff can retry.
+    await removePropertyPhotos(db, propertyId, p.images);
     const { error } = await db
       .from("properties")
       .delete()
@@ -441,15 +441,6 @@ export async function deleteProperty(
       .select("id")
       .single();
     if (error) throw new Error("Unable to delete property");
-    const prefix = db.storage
-      .from("property-images")
-      .getPublicUrl(`properties/${propertyId}/`).data.publicUrl;
-    const paths =
-      p?.images
-        .filter((url) => url.startsWith(prefix))
-        .map((url) => `properties/${propertyId}/` + url.slice(prefix.length)) ||
-      [];
-    if (paths.length) await db.storage.from("property-images").remove(paths);
     refresh();
     return { success: "Property deleted.", href: "/admin/properties" };
   } catch (e) {
@@ -546,6 +537,26 @@ export async function removeInterest(
     if (error) throw new Error("Unable to remove interest.");
     refresh();
     return { success: "Property interest removed." };
+  } catch (e) {
+    return fail(e);
+  }
+}
+export async function updateNote(
+  _: ActionState,
+  f: FormData,
+): Promise<ActionState> {
+  const { db } = await requireStaff();
+  try {
+    const body = z.string().trim().min(1).max(10000).parse(str(f, "body"));
+    const { error } = await db
+      .from("notes")
+      .update({ body })
+      .eq("id", id(f))
+      .select("id")
+      .single();
+    if (error) throw new Error("Unable to update note.");
+    refresh();
+    return { success: "Note updated." };
   } catch (e) {
     return fail(e);
   }

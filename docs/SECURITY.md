@@ -16,3 +16,11 @@
 `tests/database/bootstrap.sql` supplies minimal Auth/Storage contracts for isolated PostgreSQL policy testing; it is **not** a production migration and must never be applied to Supabase. The SQL suite executes real PostgreSQL RLS and transactional functions, but does not run GoTrue, PostgREST or the Storage HTTP service. Run the credential-dependent acceptance checks in README against your actual Supabase project before launch.
 
 CSV exports verify staff on the server and enforce RLS through the request-scoped client, preserve lead filters, disable caching and neutralize spreadsheet formula prefixes. Destructive controls require confirmation and verify an actual row changed. Authenticated CRM mutations never use service credentials.
+
+## Audit hardening — October 27, 2026
+
+Migration 006 closes a column-level gap that RLS row ownership alone cannot address: staff could change `notes.author_id` after insertion. The trigger now preserves author, note ID, creation timestamp and lead/conversation context while allowing authorized text updates. All 47 isolated PostgreSQL assertions pass, including forged-author/backdating/context rejection. The hosted probe confirmed the old behavior remains until 006 is applied; the API service credential cannot run DDL. Treat that deployment step as required, not verified hosted enforcement.
+
+Property photo cleanup errors are checked before the final database write/deletion, retaining the row for retry when Storage rejects removal. Uploaded and removed files cannot share a database transaction; staff should retry a reported partial operation and check Storage after repeated cross-service failures. Note edit/delete Server Actions perform active-staff checks and actual-row confirmation.
+
+OAuth/sign-in failures preserve only validated local destinations, password length is bounded before provider submission, failed code exchanges are handled without exposing provider details, and sign-out failures are visible. Private chat writes explicitly disable caching. Disabling automated chat preserves access to existing human conversations; stale history stops polling after ownership/unavailability rejection.

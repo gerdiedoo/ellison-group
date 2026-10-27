@@ -140,6 +140,15 @@ test("responsive homepage has no horizontal overflow", async ({
   page,
 }, testInfo) => {
   await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(
+    "way home",
+  );
+  if (testInfo.project.name === "mobile") {
+    const launcher = await page
+      .getByRole("button", { name: "Your real estate assistant" })
+      .boundingBox();
+    expect(launcher?.width).toBeLessThanOrEqual(64);
+  }
   await expect
     .poll(() =>
       page.evaluate(
@@ -147,8 +156,67 @@ test("responsive homepage has no horizontal overflow", async ({
       ),
     )
     .toBe(true);
+  await page.evaluate(() => document.fonts.ready.then(() => true));
   await page.screenshot({
     path: "work/home-" + testInfo.project.name + ".png",
     fullPage: true,
+    animations: "disabled",
   });
+  await page.screenshot({
+    path: "work/audit/home-top-" + testInfo.project.name + ".png",
+    animations: "disabled",
+  });
+});
+
+test("repeated query parameters and invalid numeric filters remain usable", async ({
+  page,
+}) => {
+  await page.goto("/home-valuation?address=123%20Main&address=456%20Other");
+  await expect(page.getByLabel("Property address")).toHaveValue("123 Main");
+  await page.goto("/login?next=/favorites&next=https://foreign.example");
+  await expect(page.locator('input[name="next"]').first()).toHaveValue(
+    "/favorites",
+  );
+  await page.goto("/properties?baths=Infinity&q=Chenal&q=Other");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(
+    "your place",
+  );
+  await page.goto("/auth/callback?code=invalid&next=https://foreign.example");
+  await expect(page).toHaveURL(/\/login\?error=Authentication/);
+});
+
+test("unknown editorial routes do not render inherited object keys", async ({
+  page,
+}) => {
+  await page.goto("/journal/toString");
+  await expect(
+    page.getByRole("heading", { name: "A different way home." }),
+  ).toBeVisible();
+});
+
+test("stale conversation recovery stops polling unavailable history", async ({
+  page,
+}) => {
+  await page.goto("/properties");
+  await page.evaluate(() =>
+    localStorage.setItem(
+      "eg_conversation_id",
+      "00000000-0000-4000-8000-000000000099",
+    ),
+  );
+  let requests = 0;
+  page.on("request", (request) => {
+    if (request.url().includes("/api/chat?id=")) requests++;
+  });
+  await page
+    .getByRole("button", { name: "Your real estate assistant" })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Start conversation", exact: true }),
+  ).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem("eg_conversation_id")))
+    .toBeNull();
+  await page.waitForTimeout(5500);
+  expect(requests).toBe(1);
 });

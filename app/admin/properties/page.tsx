@@ -1,3 +1,4 @@
+import { queryValues } from "@/lib/validation";
 import { pageNumber } from "@/lib/validation";
 import Link from "next/link";
 import { requireStaff } from "@/lib/auth";
@@ -7,7 +8,7 @@ export default async function Properties({
 }: {
   searchParams: Promise<{ q?: string; visibility?: string; page?: string }>;
 }) {
-  const p = await searchParams;
+  const p = queryValues(await searchParams);
   const { db } = await requireStaff();
   let query = db
     .from("properties")

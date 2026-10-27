@@ -23,7 +23,7 @@ export async function catalog(params: Search = {}) {
       str("status") as "For Sale" | "Pending" | "Sold",
     );
   if (str("type")) query = query.eq("property_type", str("type"));
-  if (Number(str("baths")) > 0)
+  if (Number.isFinite(Number(str("baths"))) && Number(str("baths")) > 0)
     query = query.gte("baths", Number(str("baths")));
   const min = Number(str("min")),
     max = Number(str("max")),
@@ -54,7 +54,7 @@ export const money = (n: number) =>
 export async function neighborhoodCounts() {
   if (!configured()) return {} as Record<string, number>;
   const db = await supabase();
-  const counts: Record<string, number> = {};
+  const counts: Record<string, number> = Object.create(null);
   // Page through the public projection instead of silently truncating at the API row limit.
   for (let offset = 0; ; offset += 1000) {
     const { data, error } = await db
@@ -68,5 +68,5 @@ export async function neighborhoodCounts() {
       counts[p.neighborhood] = (counts[p.neighborhood] || 0) + 1;
     if (data.length < 1000) break;
   }
-  return counts;
+  return { ...counts };
 }
