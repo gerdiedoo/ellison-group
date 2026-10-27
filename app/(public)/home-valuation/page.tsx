@@ -1,7 +1,12 @@
 import { InquiryForm } from "@/components/inquiry-form";
 import { settings } from "@/lib/settings";
 export const metadata = { title: "Home valuation" };
-export default async function Valuation() {
+export default async function Valuation({
+  searchParams,
+}: {
+  searchParams: Promise<{ address?: string }>;
+}) {
+  const initialAddress = ((await searchParams).address || "").slice(0, 300);
   const { capture } = await settings();
   return (
     <div className="wrap page two-cols">
@@ -20,7 +25,12 @@ export default async function Valuation() {
         </ul>
       </div>
       <div className="card">
-        <InquiryForm valuation kind="Valuation request" config={capture} />
+        <InquiryForm
+          valuation
+          initialAddress={initialAddress}
+          kind="Valuation request"
+          config={capture}
+        />
       </div>
     </div>
   );

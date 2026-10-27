@@ -83,6 +83,31 @@ export default async function Properties({
           </select>
         </div>
         <div className="field">
+          <label htmlFor="type">Property type</label>
+          <select id="type" name="type" defaultValue={val("type")}>
+            <option value="">Any type</option>
+            {[
+              "Estate home",
+              "Single-family",
+              "Historic home",
+              "Ranch",
+              "Condo",
+              "Land",
+            ].map((t) => (
+              <option key={t}>{t}</option>
+            ))}
+          </select>
+        </div>
+        <div className="field">
+          <label htmlFor="baths">Min baths</label>
+          <select id="baths" name="baths" defaultValue={val("baths")}>
+            <option value="">Any</option>
+            {[1, 2, 3, 4, 5].map((n) => (
+              <option key={n}>{n}</option>
+            ))}
+          </select>
+        </div>
+        <div className="field">
           <label htmlFor="status">Status</label>
           <select id="status" name="status" defaultValue={val("status")}>
             <option value="">All statuses</option>

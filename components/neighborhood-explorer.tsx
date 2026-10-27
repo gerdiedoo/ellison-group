@@ -2,9 +2,21 @@
 import { useState } from "react";
 import Link from "next/link";
 import { neighborhoods } from "@/lib/neighborhoods";
-export function NeighborhoodExplorer() {
-  const [selected, setSelected] = useState(0);
-  const n = neighborhoods[selected];
+export function NeighborhoodExplorer({
+  counts = {},
+}: {
+  counts?: Record<string, number>;
+}) {
+  const [selected, setSelected] = useState<number | null>(null);
+  const n =
+    selected === null
+      ? {
+          name: "Little Rock",
+          description:
+            "Six neighborhoods, one team that knows them. Select one on the map to see what makes it different.",
+          features: [],
+        }
+      : neighborhoods[selected];
   return (
     <section className="explore" id="neighborhoods">
       <div className="wrap">
@@ -92,6 +104,12 @@ export function NeighborhoodExplorer() {
             <span className="eyebrow">Neighborhood</span>
             <h3>{n.name}</h3>
             <p>{n.description}</p>
+            <p aria-live="polite">
+              {selected === null
+                ? Object.values(counts).reduce((a, b) => a + b, 0)
+                : counts[n.name] || 0}{" "}
+              published homes in our current selection
+            </p>
             <div className="chips">
               {n.features.map((f) => (
                 <span className="chip" key={f}>
@@ -101,10 +119,21 @@ export function NeighborhoodExplorer() {
             </div>
             <Link
               className="btn light"
-              href={"/properties?area=" + encodeURIComponent(n.name)}
+              href={
+                selected === null
+                  ? "/properties"
+                  : "/properties?area=" + encodeURIComponent(n.name)
+              }
             >
               Explore homes here →
             </Link>
+            <button
+              className="text-button"
+              style={{ marginTop: 16 }}
+              onClick={() => setSelected(null)}
+            >
+              Reset selection
+            </button>
           </div>
         </div>
       </div>

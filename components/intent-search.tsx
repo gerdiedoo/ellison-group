@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import Link from "next/link";
+
 export function IntentSearch() {
   const [mode, setMode] = useState("buy");
   return (
@@ -41,12 +41,23 @@ export function IntentSearch() {
           <small>Or wander the map to find your fit.</small>
         </form>
       ) : (
-        <>
-          <p>A real person prepares your valuation. No automated guesses.</p>
-          <Link href="/home-valuation" className="btn light">
-            Begin your valuation →
-          </Link>
-        </>
+        <form action="/home-valuation">
+          <label htmlFor="seller-address">Your home’s address</label>
+          <div className="row">
+            <input
+              id="seller-address"
+              name="address"
+              required
+              maxLength={300}
+              autoComplete="street-address"
+              placeholder="Street address"
+            />
+            <button className="go">Begin</button>
+          </div>
+          <small>
+            A real person prepares your valuation. No automated guesses.
+          </small>
+        </form>
       )}
     </div>
   );

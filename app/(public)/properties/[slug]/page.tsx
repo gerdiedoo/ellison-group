@@ -1,3 +1,4 @@
+import { PropertyGallery } from "@/components/property-gallery";
 import { notFound } from "next/navigation";
 import { configured, supabase } from "@/lib/supabase/server";
 import { money } from "@/lib/data";
@@ -23,13 +24,14 @@ export default async function Detail({
   if (error) throw new Error("Unable to load property");
   if (!p) notFound();
   const { capture, assistant } = await settings();
-  const { data: similar } = await db
+  const { data: similar, error: similarError } = await db
     .from("properties")
     .select("*")
     .eq("published", true)
     .eq("neighborhood", p.neighborhood)
     .neq("id", p.id)
     .limit(3);
+  if (similarError) throw new Error("Unable to load similar properties");
   const {
     data: { user },
   } = await db.auth.getUser();
@@ -58,27 +60,11 @@ export default async function Detail({
         </div>
         <SaveButton id={p.id} initial={saved} />
       </div>
-      <div
-        className="gallery"
-        role="region"
-        tabIndex={0}
-        aria-label="Property image gallery"
-      >
-        {(p.images.length
-          ? p.images
-          : ["/illustrations/" + p.illustration + ".svg"]
-        ).map((url, i) => (
-          <img
-            key={url}
-            src={url}
-            alt={
-              p.images.length
-                ? `${p.address}, image ${i + 1}`
-                : "Conceptual illustration; not a photograph of this property"
-            }
-          />
-        ))}
-      </div>
+      <PropertyGallery
+        images={p.images}
+        address={p.address}
+        illustration={p.illustration}
+      />
       {!p.images.length && (
         <p className="muted">
           Illustration only. Property photographs have not been added.

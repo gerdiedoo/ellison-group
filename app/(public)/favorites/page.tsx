@@ -20,7 +20,7 @@ export default async function Favorites() {
     .select("property_id")
     .eq("user_id", user.id);
   if (error) throw new Error("Unable to load favorites");
-  const { data: properties } = ids?.length
+  const { data: properties, error: propertyError } = ids?.length
     ? await db
         .from("properties")
         .select("*")
@@ -29,7 +29,8 @@ export default async function Favorites() {
           ids.map((f) => f.property_id),
         )
         .eq("published", true)
-    : { data: [] };
+    : { data: [], error: null };
+  if (propertyError) throw new Error("Unable to load saved properties");
   return (
     <div className="wrap page">
       <h1>Your favorites.</h1>

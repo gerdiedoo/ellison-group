@@ -132,3 +132,11 @@ Before launch, complete these **credential-dependent acceptance checks** on your
 - Review business facts, legal copy, testimonials and journal content. Original journal teasers lacked article bodies; concise replacement bodies are supplied for editorial review. Replace illustrative art with licensed photography where appropriate.
 
 No deployment or external-service success is implied by the local checks. See `docs/IMPLEMENTATION.md` for the original inspection/mapping and `docs/SECURITY.md` for the permission model and operational boundaries.
+
+## Public website acceptance — October 27, 2026
+
+Public pages share Supabase-backed listings/settings, stable sorted pagination, search by address/city, neighborhood/price/bed/bath/type/status filters, published-only details, image navigation/thumbnails/keyboard controls, similar properties, authenticated favorites, and persistent lead/inquiry forms. The seller shortcut carries the entered address into the valuation wizard. Inquiry context includes preferred showing time, contact method, contact purpose and valuation details. Navigation includes a visible sign-in route and closes mobile menus after navigation. Route loading, form pending states, failures, privacy consent, duplicate submission IDs and server validation are implemented.
+
+Run `npm run import:prototype` with server credentials to preserve the 16 supplied listing records in Supabase as unpublished drafts. Existing slugs are never overwritten. Review historical prices/status and publish verified inventory through the CRM; the website does not hardcode those records or publish unverified history automatically.
+
+`tests/e2e/persistence.spec.ts` creates temporary, explicitly marked listing/account fixtures and exercises real database persistence from the browser, then removes fixtures in `finally`. Run this acceptance suite against a test Supabase project. Playwright loads `.env.local` when present. The managed cloud execution environment needs its configured outbound proxy (`NODE_USE_ENV_PROXY=1`); ordinary hosting does not require this flag.

@@ -1,3 +1,4 @@
+import { SubmitButton } from "@/components/submit-button";
 import { signIn, googleSignIn } from "@/app/actions/auth";
 import Link from "next/link";
 import { safeNext } from "@/lib/validation";
@@ -40,12 +41,17 @@ export default async function Login({
             autoComplete="current-password"
           />
         </div>
-        <button className="btn solid">Sign in</button>
+        <SubmitButton pendingLabel="Signing in…">Sign in</SubmitButton>
       </form>
       {process.env.GOOGLE_OAUTH_ENABLED === "true" && (
         <form action={googleSignIn} style={{ marginTop: 20 }}>
           <input type="hidden" name="next" value={p.next || "/favorites"} />
-          <button className="btn ghost">Continue with Google</button>
+          <SubmitButton
+            className="btn ghost"
+            pendingLabel="Connecting to Google…"
+          >
+            Continue with Google
+          </SubmitButton>
         </form>
       )}
       <p className="muted" style={{ marginTop: 24 }}>

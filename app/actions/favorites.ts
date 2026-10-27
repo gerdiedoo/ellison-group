@@ -9,12 +9,13 @@ export async function toggleFavorite(id: string) {
   } = await db.auth.getUser();
   if (!user) return { error: "Sign in to save favorites across devices." };
   const property = z.uuid().parse(id);
-  const { data: existing } = await db
+  const { data: existing, error: readError } = await db
     .from("favorites")
     .select("property_id")
     .eq("user_id", user.id)
     .eq("property_id", property)
     .maybeSingle();
+  if (readError) return { error: "Unable to read favorites. Please retry." };
   const { error } = existing
     ? await db
         .from("favorites")

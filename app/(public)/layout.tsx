@@ -1,3 +1,4 @@
+import { configured, supabase } from "@/lib/supabase/server";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { ChatWidget } from "@/components/chat-widget";
@@ -9,9 +10,12 @@ export default async function PublicLayout({
   children: React.ReactNode;
 }) {
   const { company, assistant, capture } = await settings();
+  const user = configured()
+    ? (await (await supabase()).auth.getUser()).data.user
+    : null;
   return (
     <>
-      <SiteHeader name={company.name} />
+      <SiteHeader name={company.name} signedIn={!!user} />
       <main id="main">{children}</main>
       <footer>
         <div className="wrap">

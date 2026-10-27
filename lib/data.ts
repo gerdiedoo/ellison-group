@@ -22,6 +22,9 @@ export async function catalog(params: Search = {}) {
       "listing_status",
       str("status") as "For Sale" | "Pending" | "Sold",
     );
+  if (str("type")) query = query.eq("property_type", str("type"));
+  if (Number(str("baths")) > 0)
+    query = query.gte("baths", Number(str("baths")));
   const min = Number(str("min")),
     max = Number(str("max")),
     beds = Number(str("beds"));
@@ -32,6 +35,7 @@ export async function catalog(params: Search = {}) {
   query = query.order(sort === "newest" ? "created_at" : "price", {
     ascending: sort === "price-asc",
   });
+  query = query.order("id");
   const page = pageNumber(str("page"));
   const { data, error, count } = await query.range(
     (page - 1) * 12,
@@ -46,3 +50,23 @@ export const money = (n: number) =>
     currency: "USD",
     maximumFractionDigits: 0,
   }).format(n);
+
+export async function neighborhoodCounts() {
+  if (!configured()) return {} as Record<string, number>;
+  const db = await supabase();
+  const counts: Record<string, number> = {};
+  // Page through the public projection instead of silently truncating at the API row limit.
+  for (let offset = 0; ; offset += 1000) {
+    const { data, error } = await db
+      .from("properties")
+      .select("neighborhood")
+      .eq("published", true)
+      .order("id")
+      .range(offset, offset + 999);
+    if (error) throw new Error("Unable to load neighborhood availability.");
+    for (const p of data)
+      counts[p.neighborhood] = (counts[p.neighborhood] || 0) + 1;
+    if (data.length < 1000) break;
+  }
+  return counts;
+}

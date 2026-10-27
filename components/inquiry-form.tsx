@@ -19,6 +19,7 @@ export function InquiryForm({
   config,
   valuation = false,
   onSuccess,
+  initialAddress = "",
 }: {
   kind?: string;
   propertyId?: string;
@@ -26,6 +27,7 @@ export function InquiryForm({
   config: CaptureConfig;
   valuation?: boolean;
   onSuccess?: () => void;
+  initialAddress?: string;
 }) {
   const [step, setStep] = useState(1),
     [status, setStatus] = useState(""),
@@ -41,6 +43,7 @@ export function InquiryForm({
     }
     if (!requestId.current) requestId.current = crypto.randomUUID();
     const f = new FormData(form);
+    if (pending) return;
     setPending(true);
     setStatus("");
     try {
@@ -63,6 +66,9 @@ export function InquiryForm({
             address: f.get("address") || undefined,
             beds: f.get("beds") || undefined,
             timeline: f.get("timeline") || undefined,
+            preferred_time: f.get("preferred_time") || undefined,
+            contact_method: f.get("contact_method") || undefined,
+            purpose: f.get("purpose") || undefined,
           },
         }),
       });
@@ -110,6 +116,7 @@ export function InquiryForm({
             <div className="field">
               <label htmlFor="address">Property address</label>
               <input
+                defaultValue={initialAddress}
                 id="address"
                 name="address"
                 autoComplete="street-address"
@@ -198,6 +205,58 @@ export function InquiryForm({
                 min={new Date().toISOString().slice(0, 10)}
                 required
               />
+            </div>
+          )}
+          {kind === "Showing request" && (
+            <div className="field">
+              <label htmlFor="preferred_time">Preferred showing time</label>
+              <select id="preferred_time" name="preferred_time">
+                {[
+                  "Morning (9–12)",
+                  "Afternoon (12–5)",
+                  "Evening (5–8)",
+                  "Flexible",
+                ].map((t) => (
+                  <option key={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+          )}
+          <div className="field">
+            <label
+              htmlFor={
+                "contact-method-" + (conversationId || propertyId || "general")
+              }
+            >
+              Preferred contact method
+            </label>
+            <select
+              id={
+                "contact-method-" + (conversationId || propertyId || "general")
+              }
+              name="contact_method"
+            >
+              {["No preference", "Email", "Phone call", "Text message"].map(
+                (t) => (
+                  <option key={t}>{t}</option>
+                ),
+              )}
+            </select>
+          </div>
+          {kind === "General" && !propertyId && (
+            <div className="field">
+              <label htmlFor="purpose">I’m interested in</label>
+              <select id="purpose" name="purpose">
+                {[
+                  "Buying",
+                  "Selling",
+                  "Selling & buying",
+                  "Renting",
+                  "Something else",
+                ].map((t) => (
+                  <option key={t}>{t}</option>
+                ))}
+              </select>
             </div>
           )}
           <div className="field">

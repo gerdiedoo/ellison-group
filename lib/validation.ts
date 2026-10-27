@@ -48,6 +48,26 @@ export const captureSchema = z
         address: z.string().trim().max(300).optional(),
         beds: z.string().max(20).optional(),
         timeline: z.string().max(80).optional(),
+        preferred_time: z
+          .enum([
+            "Morning (9–12)",
+            "Afternoon (12–5)",
+            "Evening (5–8)",
+            "Flexible",
+          ])
+          .optional(),
+        contact_method: z
+          .enum(["No preference", "Email", "Phone call", "Text message"])
+          .optional(),
+        purpose: z
+          .enum([
+            "Buying",
+            "Selling",
+            "Selling & buying",
+            "Renting",
+            "Something else",
+          ])
+          .optional(),
       })
       .default({}),
   })

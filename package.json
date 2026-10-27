@@ -12,7 +12,8 @@
     "test:e2e": "playwright test",
     "test:db": "bash tests/database/run.sh",
     "verify:prototype": "node scripts/verify-prototype.mjs",
-    "db:types": "node scripts/generate-database-types.mjs"
+    "db:types": "node scripts/generate-database-types.mjs",
+    "import:prototype": "node scripts/import-prototype.mjs"
   },
   "dependencies": {
     "next": "16.4.3",

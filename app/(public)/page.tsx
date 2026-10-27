@@ -1,11 +1,14 @@
 import Link from "next/link";
-import { catalog, money } from "@/lib/data";
+import { catalog, money, neighborhoodCounts } from "@/lib/data";
 import { NeighborhoodExplorer } from "@/components/neighborhood-explorer";
 import { AboutContent } from "@/components/about-content";
 import { ClientStories } from "@/components/client-stories";
 import { IntentSearch } from "@/components/intent-search";
 export default async function Home() {
-  const { properties, unconfigured } = await catalog();
+  const [{ properties, unconfigured }, counts] = await Promise.all([
+    catalog(),
+    neighborhoodCounts(),
+  ]);
   return (
     <>
       <div className="hero">
@@ -51,6 +54,26 @@ export default async function Home() {
               </div>
             </div>
             <IntentSearch />
+          </div>
+        </div>
+      </div>
+      <div className="facts">
+        <div className="wrap">
+          <div className="fact">
+            <b>33</b>
+            <span>Years in real estate</span>
+          </div>
+          <div className="fact">
+            <b>1,131</b>
+            <span>Closed transactions</span>
+          </div>
+          <div className="fact">
+            <b>1994</b>
+            <span>Kerry licensed</span>
+          </div>
+          <div className="fact">
+            <b>{Object.values(counts).reduce((a, b) => a + b, 0)}</b>
+            <span>Published homes in our selection</span>
           </div>
         </div>
       </div>
@@ -116,7 +139,7 @@ export default async function Home() {
           )}
         </div>
       </section>
-      <NeighborhoodExplorer />
+      <NeighborhoodExplorer counts={counts} />
       <AboutContent />
       <ClientStories />
       <section className="value">

@@ -7,9 +7,12 @@ test("homepage retains the brand and working buying/selling intent", async ({
     "way home",
   );
   await page.getByRole("tab", { name: "I’m selling" }).click();
-  await expect(
-    page.getByRole("link", { name: "Begin your valuation" }),
-  ).toHaveAttribute("href", "/home-valuation");
+  await page.getByLabel("Your home’s address").fill("123 Main Street");
+  await page.getByRole("button", { name: "Begin", exact: true }).click();
+  await expect(page.getByLabel("Property address")).toHaveValue(
+    "123 Main Street",
+  );
+  await page.goto("/");
   await page.getByRole("tab", { name: "I’m buying" }).click();
   await page.getByLabel("Where in Little Rock?").selectOption("Chenal");
   await page.getByRole("button", { name: "Show homes" }).click();
@@ -64,7 +67,7 @@ test("favorites offer authentication without blocking browsing", async ({
 }) => {
   await page.goto("/favorites");
   await expect(
-    page.getByRole("link", { name: "Sign in", exact: true }),
+    page.getByRole("main").getByRole("link", { name: "Sign in", exact: true }),
   ).toBeVisible();
   await page.goto("/properties");
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
@@ -126,7 +129,9 @@ test("public forms never report success when integrations are unavailable", asyn
   await page.getByLabel("Phone number", { exact: true }).fill("5015551234");
   await page.locator('input[name="consent"]').check();
   await page.getByRole("button", { name: "Send request" }).click();
-  await expect(page.getByRole("main").getByRole("alert")).toContainText("not available");
+  await expect(page.getByRole("main").getByRole("alert")).toContainText(
+    "not available",
+  );
   await expect(page.getByRole("heading", { name: "Thank you." })).toHaveCount(
     0,
   );

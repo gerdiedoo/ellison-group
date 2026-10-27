@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       );
     const v = input.data;
     const { capture } = await settings();
-    if (capture.phoneRequired && v.phone.length < 7)
+    if (capture.phoneRequired && v.phone.replace(/\D/g, "").length < 7)
       return NextResponse.json(
         { error: "Please enter a phone number." },
         { status: 400 },

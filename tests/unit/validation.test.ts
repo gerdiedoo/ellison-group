@@ -132,3 +132,29 @@ describe("search pagination boundaries", () => {
     expect(pageNumber(input)).toBe(expected),
   );
 });
+
+describe("public inquiry preferences", () => {
+  it("retains validated showing time and contact preferences", () => {
+    expect(
+      captureSchema.parse({
+        ...base,
+        context: {
+          preferred_time: "Afternoon (12–5)",
+          contact_method: "Email",
+          purpose: "Buying",
+        },
+      }).context,
+    ).toMatchObject({
+      preferred_time: "Afternoon (12–5)",
+      contact_method: "Email",
+      purpose: "Buying",
+    });
+  });
+  it("rejects unsupported showing slots", () =>
+    expect(
+      captureSchema.safeParse({
+        ...base,
+        context: { preferred_time: "Unconfirmed midnight booking" },
+      }).success,
+    ).toBe(false));
+});
