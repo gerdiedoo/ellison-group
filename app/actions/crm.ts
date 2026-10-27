@@ -599,3 +599,69 @@ export async function deleteTask(
     return fail(e);
   }
 }
+
+export async function updateLeadContact(
+  _: ActionState,
+  f: FormData,
+): Promise<ActionState> {
+  const { db } = await requireStaff();
+  try {
+    const patch = {
+      full_name: z.string().min(2).max(120).parse(str(f, "full_name")),
+      email: emailSchema.parse(str(f, "email")),
+      phone: z.string().max(40).parse(str(f, "phone")),
+    };
+    const { error } = await db
+      .from("leads")
+      .update(patch)
+      .eq("id", id(f))
+      .select("id")
+      .single();
+    if (error) throw new Error("Unable to update contact information.");
+    refresh();
+    return { success: "Contact information saved." };
+  } catch (e) {
+    return fail(e);
+  }
+}
+export async function updateLeadPipeline(
+  _: ActionState,
+  f: FormData,
+): Promise<ActionState> {
+  const { db } = await requireStaff();
+  try {
+    const { error } = await db
+      .from("leads")
+      .update({
+        status: z.enum(leadStatuses).parse(f.get("status")),
+        assigned_to: await assignment(db, f),
+      })
+      .eq("id", id(f))
+      .select("id")
+      .single();
+    if (error) throw new Error("Unable to update lead pipeline.");
+    refresh();
+    return { success: "Lead updated." };
+  } catch (e) {
+    return fail(e);
+  }
+}
+export async function completeFollowup(
+  _: ActionState,
+  f: FormData,
+): Promise<ActionState> {
+  const { db } = await requireStaff();
+  try {
+    const { error } = await db
+      .from("tasks")
+      .update({ done: true })
+      .eq("id", id(f))
+      .select("id")
+      .single();
+    if (error) throw new Error("Unable to complete follow-up.");
+    refresh();
+    return { success: "Follow-up marked done." };
+  } catch (e) {
+    return fail(e);
+  }
+}

@@ -1,54 +1,44 @@
-import Link from "next/link";
+import type { Metadata } from "next";
 import { requireStaff } from "@/lib/auth";
-import { signOut } from "@/app/actions/auth";
+import { AdminShell } from "@/components/admin/admin-shell";
+import "./prototype.css";
 export const dynamic = "force-dynamic";
-const links = [
-  ["", "Overview"],
-  ["leads", "Leads"],
-  ["properties", "Properties"],
-  ["inquiries", "Inquiries"],
-  ["conversations", "Conversations"],
-  ["analytics", "Analytics"],
-  ["activity", "Activity Log"],
-  ["assistant", "AI Assistant"],
-  ["lead-capture", "Lead Capture"],
-  ["team", "Team"],
-  ["settings", "Settings"],
-];
+export const metadata: Metadata = {
+  title: "Admin — The Ellison Group",
+  robots: { index: false, follow: false },
+};
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { profile } = await requireStaff();
+  const { db, user, profile } = await requireStaff();
+  const [leads, conversations] = await Promise.all([
+    db
+      .from("leads")
+      .select("id", { count: "exact" })
+      .eq("status", "New")
+      .limit(1),
+    db
+      .from("conversations")
+      .select("id", { count: "exact" })
+      .eq("status", "human")
+      .limit(1),
+  ]);
+  if (
+    leads.error ||
+    conversations.error ||
+    leads.count === null ||
+    conversations.count === null
+  )
+    throw new Error("Unable to load workspace navigation");
   return (
-    <div className="admin-shell">
-      <aside className="admin-nav">
-        <Link href="/admin" className="header-brand">
-          The Ellison Group
-        </Link>
-        <p style={{ padding: 10, fontSize: 12 }}>WORKSPACE · {profile.role}</p>
-        <nav aria-label="CRM">
-          {links
-            .filter(
-              ([slug]) =>
-                profile.role === "admin" ||
-                !["assistant", "lead-capture", "settings", "team"].includes(
-                  slug,
-                ),
-            )
-            .map(([slug, label]) => (
-              <Link href={"/admin" + (slug ? "/" + slug : "")} key={slug}>
-                {label}
-              </Link>
-            ))}
-        </nav>
-        <Link href="/">View website ↗</Link>
-        <form action={signOut}>
-          <button className="btn light">Sign out</button>
-        </form>
-      </aside>
-      <main className="admin-main">{children}</main>
-    </div>
+    <AdminShell
+      profile={profile}
+      email={user.email || ""}
+      badges={{ leads: leads.count, conversations: conversations.count }}
+    >
+      {children}
+    </AdminShell>
   );
 }

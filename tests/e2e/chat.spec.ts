@@ -244,13 +244,21 @@ test("grounded Gemini conversation, lead capture and staff-controlled handoff", 
     await staff.getByRole("button", { name: "Sign in", exact: true }).click();
     await expect(staff).toHaveURL("http://localhost:3000/admin");
     await staff.goto("/admin/conversations/" + conversationId);
-    await expect(staff.getByText(question, { exact: true })).toBeVisible();
+    await expect(
+      staff
+        .getByRole("log", { name: "Conversation transcript" })
+        .getByText(question, { exact: true }),
+    ).toBeVisible();
     const reply = "A member of our team is here to help " + token;
     await staff.getByLabel("Reply to visitor", { exact: true }).fill(reply);
     await staff
       .getByRole("button", { name: "Send reply", exact: true })
       .click();
-    await expect(staff.getByText(reply, { exact: true })).toBeVisible();
+    await expect(
+      staff
+        .getByRole("log", { name: "Conversation transcript" })
+        .getByText(reply, { exact: true }),
+    ).toBeVisible();
     await expect(log).toContainText(reply, { timeout: 15000 });
     const snapshot = await page.request.get("/api/chat?id=" + conversationId);
     expect(

@@ -32,12 +32,16 @@ export default async function Team({
   if (error) throw new Error("Unable to load team");
   return (
     <>
-      <h1>Team Management</h1>
-      <p>
-        Create accounts using Supabase Auth (invite user), then assign roles
-        here. New accounts start as visitors. No user may change their own
-        access. Profiles are shown in pages of 50.
-      </p>
+      <div className="ph">
+        <div>
+          <h1>Team Management</h1>
+          <p>
+            Create accounts using Supabase Auth (invite user), then assign roles
+            here. New accounts start as visitors. No user may change their own
+            access. Profiles are shown in pages of 50.
+          </p>
+        </div>
+      </div>
       <form className="toolbar">
         <div className="field">
           <label htmlFor="q">Search profiles</label>
@@ -46,10 +50,24 @@ export default async function Team({
         <button className="btn">Search</button>
       </form>
       <p>{count} matching profiles</p>
-      <div className="grid">
+      <div className="grid g3">
         {team?.map((t) => (
           <div className="card" key={t.id}>
-            <h2>{t.full_name || "Unnamed user"}</h2>
+            <div className="li" style={{ marginBottom: 16, paddingTop: 0 }}>
+              <span className="av">
+                {(t.full_name || "User")
+                  .split(" ")
+                  .map((part) => part[0])
+                  .slice(0, 2)
+                  .join("")}
+              </span>
+              <div className="b">
+                <h2>{t.full_name || "Unnamed user"}</h2>
+                <div className="m">
+                  {t.role} · {t.active ? "Active" : "Inactive"}
+                </div>
+              </div>
+            </div>
             <small style={{ overflowWrap: "anywhere" }}>{t.id}</small>
             {t.id === user.id ? (
               <p className="notice">Your account · {t.role} · active</p>

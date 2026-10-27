@@ -14,7 +14,7 @@ export function Field({
 }) {
   return (
     <div className="field">
-      <label>
+      <label className="f">
         {label}
         <input
           aria-label={label}
@@ -41,7 +41,7 @@ export function Area({
 }) {
   return (
     <div className="field">
-      <label>
+      <label className="f">
         {label}
         <textarea
           aria-label={label}
@@ -66,7 +66,7 @@ export function Select({
 }) {
   return (
     <div className="field">
-      <label>
+      <label className="f">
         {label}
         <select aria-label={label} name={name} defaultValue={value}>
           {options.map((s) => (
@@ -88,7 +88,7 @@ export function Assignment({
 }) {
   return (
     <div className="field">
-      <label>
+      <label className="f">
         Assigned agent
         <select
           aria-label="Assigned agent"
@@ -117,10 +117,18 @@ export function Check({
   label: string;
   checked?: boolean;
 }) {
+  const toggle = [
+    "enabled",
+    "handoffEnabled",
+    "phoneRequired",
+    "googleEnabled",
+    "active",
+  ].includes(name);
   return (
-    <label className="form-check">
+    <label className={toggle ? "tog" : "form-check"}>
       <input type="checkbox" name={name} defaultChecked={checked} />
-      <span>{label}</span>
+      {toggle && <span className="sw" aria-hidden="true" />}
+      <span className={toggle ? "t" : undefined}>{label}</span>
     </label>
   );
 }

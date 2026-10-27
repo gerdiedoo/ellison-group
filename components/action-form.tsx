@@ -6,11 +6,13 @@ export function ActionForm({
   children,
   label = "Save changes",
   className = "stack",
+  buttonClassName = "btn solid",
 }: {
   action: (state: ActionState, form: FormData) => Promise<ActionState>;
   children: React.ReactNode;
   label?: string;
   className?: string;
+  buttonClassName?: string;
 }) {
   const [state, submit, pending] = useActionState(action, {});
   return (
@@ -40,7 +42,7 @@ export function ActionForm({
           )}
         </p>
       )}
-      <button className="btn solid" disabled={pending}>
+      <button className={buttonClassName} disabled={pending}>
         {pending ? "Saving…" : label}
       </button>
     </form>

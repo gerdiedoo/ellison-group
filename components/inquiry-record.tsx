@@ -17,9 +17,9 @@ export function InquiryRecord({
 }) {
   return (
     <article className="card" id={i.id}>
-      <div className="two-cols">
+      <div className="grid g22">
         <div>
-          <span className="eyebrow">{i.kind}</span>
+          <span className="sub">{i.kind}</span>
           <h2>
             <Link href={"/admin/leads/" + i.lead_id}>
               {i.lead?.full_name || "View lead"}

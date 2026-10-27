@@ -10,6 +10,8 @@ export type LeadFilters = {
   since?: string;
   sort?: string;
   page?: string;
+  range?: string;
+  dir?: string;
 };
 export function leadQuery(db: SupabaseClient<Database>, p: LeadFilters) {
   let query = db.from("leads").select("*", { count: "exact" });
@@ -34,9 +36,31 @@ export function leadQuery(db: SupabaseClient<Database>, p: LeadFilters) {
     !Number.isNaN(Date.parse(p.since))
   )
     query = query.gte("created_at", p.since + "T00:00:00Z");
-  return query
-    .order(p.sort === "name" ? "full_name" : "created_at", {
-      ascending: p.sort === "name" || p.sort === "oldest",
-    })
-    .order("id");
+  if (["7", "30", "90"].includes(p.range || ""))
+    query = query.gte(
+      "created_at",
+      new Date(Date.now() - Number(p.range) * 86400000).toISOString(),
+    );
+  const columns = [
+    "full_name",
+    "email",
+    "phone",
+    "source",
+    "status",
+    "assigned_to",
+    "updated_at",
+    "created_at",
+  ];
+  const aliases: Record<string, string> = {
+    name: "full_name",
+    newest: "created_at",
+    oldest: "created_at",
+  };
+  const column =
+    aliases[p.sort || ""] ||
+    (columns.includes(p.sort || "") ? p.sort! : "created_at");
+  const ascending = p.dir
+    ? p.dir === "asc"
+    : p.sort === "name" || p.sort === "oldest";
+  return query.order(column, { ascending }).order("id");
 }

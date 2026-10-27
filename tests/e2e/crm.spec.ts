@@ -111,7 +111,7 @@ test("protected CRM workflows and direct API permissions", async ({
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
     await expect(page).toHaveURL("http://localhost:3000/admin");
     await expect(
-      page.getByRole("heading", { name: "A considered overview." }),
+      page.getByRole("heading", { name: "Overview", exact: true }),
     ).toBeVisible();
     await page.goto("/admin/properties/new");
     await page.getByLabel("Street address", { exact: true }).fill(name);
@@ -219,7 +219,14 @@ test("protected CRM workflows and direct API permissions", async ({
       assigned_to: agent.id,
     });
     await page.goto("/admin/leads/" + leadId);
+    const pipelineSaved = page.waitForResponse(
+      (r) =>
+        r.request().method() === "POST" &&
+        new URL(r.url()).pathname === "/admin/leads/" + leadId,
+    );
     await page.getByLabel("Status", { exact: true }).selectOption("Qualified");
+    await pipelineSaved;
+    await expect(page.getByLabel("Status", { exact: true })).toBeEnabled();
     await submit(
       page,
       page.getByRole("button", { name: "Save changes", exact: true }),
@@ -234,7 +241,7 @@ test("protected CRM workflows and direct API permissions", async ({
     await submit(
       page,
       page.getByRole("button", {
-        name: "Add interested property",
+        name: "Add",
         exact: true,
       }),
     );
@@ -248,7 +255,10 @@ test("protected CRM workflows and direct API permissions", async ({
       page.getByRole("button", { name: "Add note", exact: true }),
     );
     await expect(
-      page.locator("p").filter({ hasText: "Private note " + token }),
+      page
+        .locator(".note")
+        .filter({ hasText: "Private note " + token })
+        .first(),
     ).toBeVisible();
     const note = await owner
       .from("notes")
@@ -257,6 +267,7 @@ test("protected CRM workflows and direct API permissions", async ({
       .single();
     must(note.error);
     expect(note.data?.author_id).toBe(admin.id);
+    await page.getByText("Manage note", { exact: true }).click();
     await page
       .getByLabel("Edit note", { exact: true })
       .fill("Corrected private note " + token);
@@ -280,7 +291,7 @@ test("protected CRM workflows and direct API permissions", async ({
     await page.getByLabel("Due date (Central time)").fill("2030-12-01");
     await submit(
       page,
-      page.getByRole("button", { name: "Add follow-up", exact: true }),
+      page.getByRole("button", { name: "Add reminder", exact: true }),
     );
     const task = await owner
       .from("tasks")
@@ -288,6 +299,7 @@ test("protected CRM workflows and direct API permissions", async ({
       .eq("lead_id", leadId)
       .single();
     must(task.error);
+    await page.getByText("Edit reminder", { exact: true }).click();
     await page.getByLabel("Task title").fill("Updated follow up " + token);
     await page.getByLabel("Completed", { exact: true }).check();
     await submit(
@@ -352,7 +364,9 @@ test("protected CRM workflows and direct API permissions", async ({
     );
     await page.goto("/admin/conversations/" + conversationId);
     await expect(
-      page.getByText("Visitor question " + token, { exact: true }),
+      page
+        .getByRole("log", { name: "Conversation transcript" })
+        .getByText("Visitor question " + token, { exact: true }),
     ).toBeVisible();
     await page
       .getByLabel("Handling (bot resumes automated replies)")
@@ -368,7 +382,9 @@ test("protected CRM workflows and direct API permissions", async ({
       page.getByRole("button", { name: "Send reply", exact: true }),
     );
     await expect(
-      page.getByText("Team reply " + token, { exact: true }),
+      page
+        .getByRole("log", { name: "Conversation transcript" })
+        .getByText("Team reply " + token, { exact: true }),
     ).toBeVisible();
     expect(
       (
@@ -467,20 +483,13 @@ test("protected CRM workflows and direct API permissions", async ({
     await expect(
       page.locator("td").filter({ hasText: leadId }).first(),
     ).toBeVisible();
-    await page.goto("/admin");
+    await page.goto("/admin?range=all");
     const count = await owner
       .from("leads")
       .select("id", { count: "exact" })
       .limit(1);
     must(count.error);
-    await expect(
-      page
-        .locator("a.card")
-        .filter({
-          has: page.locator(".eyebrow").filter({ hasText: /^leads$/ }),
-        })
-        .locator(".metric"),
-    ).toHaveText(String(count.count));
+    await expect(page.locator("#kpi-total .v")).toHaveText(String(count.count));
     const csv = await page.request.get("/admin/leads/export?q=" + token);
     expect(csv.status()).toBe(200);
     expect(await csv.text()).toContain(email);
@@ -738,14 +747,19 @@ test("protected CRM workflows and direct API permissions", async ({
         .error,
     );
     await page.goto("/admin/leads/" + leadId);
+    await page
+      .getByText("Manage interested properties", { exact: true })
+      .click();
     await submit(
       page,
       page.getByRole("button", { name: "Remove interest", exact: true }),
     );
+    await page.getByText("Manage note", { exact: true }).click();
     await submit(
       page,
       page.getByRole("button", { name: "Delete note", exact: true }),
     );
+    await page.getByText("Edit reminder", { exact: true }).click();
     await submit(
       page,
       page.getByRole("button", { name: "Delete task", exact: true }),
@@ -756,10 +770,15 @@ test("protected CRM workflows and direct API permissions", async ({
     expect(
       (await owner.from("tasks").select("id").eq("lead_id", leadId)).data,
     ).toHaveLength(0);
+    await page
+      .getByRole("button", { name: "Delete lead", exact: true })
+      .click();
     await page.getByLabel("Confirm permanent lead deletion").check();
     await submit(
       page,
-      page.getByRole("button", { name: "Delete lead", exact: true }),
+      page
+        .getByRole("dialog")
+        .getByRole("button", { name: "Delete lead", exact: true }),
     );
     expect(
       (await owner.from("leads").select("id").eq("id", leadId)).data,

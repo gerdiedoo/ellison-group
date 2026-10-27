@@ -21,39 +21,54 @@ export default async function Analytics() {
   };
   return (
     <>
-      <h1>Analytics</h1>
-      <p>
-        Lifetime counts from stored records. Conversion stages show each lead’s
-        current status.
-      </p>
-      <div className="two-cols">
-        {Object.entries(report).map(([key, rows]) => (
-          <div className="card" key={key}>
-            <h2>{labels[key as keyof typeof labels]}</h2>
-            {rows.length ? (
-              rows.map((r) => (
-                <div key={r.label} style={{ margin: "16px 0" }}>
-                  <div
-                    className="inline"
-                    style={{ justifyContent: "space-between" }}
-                  >
-                    <span>{r.label}</span>
-                    <strong>{r.value}</strong>
+      <div className="ph">
+        <div>
+          <h1>Analytics</h1>
+          <p>
+            Lifetime activity from the shared CRM. Conversion stages show each
+            lead’s current status.
+          </p>
+        </div>
+      </div>
+      <div className="grid g22">
+        {Object.entries(report).map(([key, rows]) => {
+          const maximum = Math.max(1, ...rows.map((row) => row.value));
+          return (
+            <div className="card" key={key}>
+              <div className="card-h">
+                <h2>{labels[key as keyof typeof labels]}</h2>
+              </div>
+              {rows.length ? (
+                rows.map((row, index) => (
+                  <div className="bar" key={row.label}>
+                    <span>{row.label}</span>
+                    <div
+                      className="tr"
+                      role="meter"
+                      aria-label={row.label}
+                      aria-valuemin={0}
+                      aria-valuemax={maximum}
+                      aria-valuenow={row.value}
+                    >
+                      <b
+                        style={{
+                          width: `${(row.value / maximum) * 100}%`,
+                          background:
+                            index % 2 ? "var(--brick)" : "var(--moss)",
+                        }}
+                      />
+                    </div>
+                    <strong style={{ textAlign: "right" }}>{row.value}</strong>
                   </div>
-                  <meter
-                    aria-label={r.label}
-                    min={0}
-                    max={Math.max(1, ...rows.map((x) => x.value))}
-                    value={r.value}
-                    style={{ width: "100%" }}
-                  />
+                ))
+              ) : (
+                <div className="empty">
+                  <b>No data yet</b>Activity will appear as records are created.
                 </div>
-              ))
-            ) : (
-              <p>No data yet.</p>
-            )}
-          </div>
-        ))}
+              )}
+            </div>
+          );
+        })}
       </div>
     </>
   );

@@ -20,10 +20,20 @@ export default async function EditProperty({
   if (!p) notFound();
   return (
     <>
-      <Link className="link" href="/admin/properties">
-        ← Properties
-      </Link>
-      <h1>{p.address}</h1>
+      <div className="crumb">
+        <Link href="/admin/properties">← Properties</Link>
+      </div>
+      <div className="ph">
+        <div>
+          <h1>{p.address}</h1>
+          <p>
+            {p.location} · {p.listing_status}
+          </p>
+        </div>
+        <Link className="btn ghost" href={"/admin/properties?selected=" + p.id}>
+          Property details
+        </Link>
+      </div>
       <PropertyEditor property={p} team={team || []} />
     </>
   );

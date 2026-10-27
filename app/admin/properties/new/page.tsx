@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireStaff } from "@/lib/auth";
 import { PropertyEditor } from "@/components/property-editor";
 export default async function NewProperty() {
@@ -9,7 +10,15 @@ export default async function NewProperty() {
   if (error) throw new Error("Unable to load team");
   return (
     <>
-      <h1>Create property</h1>
+      <div className="crumb">
+        <Link href="/admin/properties">← Properties</Link>
+      </div>
+      <div className="ph">
+        <div>
+          <h1>Create property</h1>
+          <p>Add a listing to the shared property catalog.</p>
+        </div>
+      </div>
       <PropertyEditor team={data || []} />
     </>
   );

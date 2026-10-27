@@ -16,8 +16,10 @@ export function PropertyEditor({
         label={p ? "Save property" : "Create property"}
       >
         <input type="hidden" name="id" value={p?.id || ""} />
-        <div className="two-cols">
-          <div>
+        <div className="grid g22">
+          <section className="card">
+            <h2>Property information</h2>
+            <p className="sub">Address, specifications and pricing.</p>
             <Field
               name="address"
               label="Street address"
@@ -81,8 +83,10 @@ export function PropertyEditor({
               type="number"
               value={p?.sqft || 0}
             />
-          </div>
-          <div>
+          </section>
+          <section className="card">
+            <h2>Listing details</h2>
+            <p className="sub">Presentation, publication and assignment.</p>
             <Area
               name="description"
               label="Description"
@@ -137,10 +141,10 @@ export function PropertyEditor({
               Uploads use the public listing photography bucket. Do not upload
               private documents.
             </p>
-          </div>
+          </section>
         </div>
         {!!p?.images.length && (
-          <div className="grid">
+          <div className="grid g3">
             {p.images.map((url, i) => (
               <div className="card" key={url}>
                 <img
@@ -162,7 +166,7 @@ export function PropertyEditor({
         )}
       </ActionForm>
       {p && (
-        <div className="card" style={{ marginTop: 40 }}>
+        <div className="card" style={{ marginTop: 18 }}>
           <h2>Delete property</h2>
           <p>
             Deletion removes the listing and its stored photos. Existing

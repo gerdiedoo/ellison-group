@@ -5,7 +5,12 @@ import { requireStaff } from "@/lib/auth";
 export default async function Activity({
   searchParams,
 }: {
-  searchParams: Promise<{ entity?: string; action?: string; page?: string }>;
+  searchParams: Promise<{
+    entity?: string;
+    action?: string;
+    page?: string;
+    q?: string;
+  }>;
 }) {
   const p = queryValues(await searchParams);
   const { db } = await requireStaff();
@@ -13,6 +18,14 @@ export default async function Activity({
     .from("activity_logs")
     .select("*", { count: "exact" })
     .order("created_at", { ascending: false });
+  const search = (p.q || "")
+    .replace(/[^\p{L}\p{N}\s-]/gu, " ")
+    .trim()
+    .slice(0, 100);
+  if (search)
+    q = q.or(
+      `entity_type.ilike.%${search}%,entity_id.ilike.%${search}%,action.ilike.%${search}%`,
+    );
   if (p.entity) q = q.eq("entity_type", p.entity);
   if (p.action) q = q.eq("action", p.action);
   const page = pageNumber(p.page);
@@ -26,68 +39,133 @@ export default async function Activity({
     "/admin/activity?" + new URLSearchParams({ ...p, page: String(n) });
   return (
     <>
-      <h1>Activity Log</h1>
-      <p>
-        Server-created records of significant changes. Audit records cannot be
-        edited through this application.
-      </p>
+      <div className="ph">
+        <div>
+          <h1>Activity Log</h1>
+          <p>Everything that happens to leads, inquiries and conversations.</p>
+        </div>
+      </div>
       <form className="toolbar">
-        <div className="field">
-          <label htmlFor="entity">Record type</label>
-          <select name="entity" id="entity" defaultValue={p.entity}>
-            <option value="">All</option>
-            {[
-              "profiles",
-              "leads",
-              "properties",
-              "inquiries",
-              "conversations",
-              "messages",
-              "notes",
-              "tasks",
-              "settings",
-            ].map((v) => (
-              <option key={v}>{v}</option>
-            ))}
-          </select>
-        </div>
-        <div className="field">
-          <label htmlFor="action">Operation</label>
-          <select name="action" id="action" defaultValue={p.action}>
-            <option value="">All</option>
-            {["INSERT", "UPDATE", "DELETE"].map((v) => (
-              <option key={v}>{v}</option>
-            ))}
-          </select>
-        </div>
-        <button className="btn">Filter</button>
+        <input
+          type="search"
+          name="q"
+          placeholder="Search activity or record"
+          aria-label="Search activity"
+          defaultValue={p.q}
+        />
+        <select name="entity" aria-label="Record type" defaultValue={p.entity}>
+          <option value="">All record types</option>
+          {[
+            "profiles",
+            "leads",
+            "properties",
+            "inquiries",
+            "conversations",
+            "messages",
+            "notes",
+            "tasks",
+            "settings",
+          ].map((value) => (
+            <option key={value}>{value}</option>
+          ))}
+        </select>
+        <select name="action" aria-label="Operation" defaultValue={p.action}>
+          <option value="">All operations</option>
+          {["INSERT", "UPDATE", "DELETE"].map((value) => (
+            <option key={value}>{value}</option>
+          ))}
+        </select>
+        <button className="btn sm">Filter</button>
+        <span className="cnt">{count} operations</span>
       </form>
-      <p>{count} operations</p>
-      <div className="table-scroll">
+      <div className="tw rc">
         <table>
           <thead>
             <tr>
               <th>When</th>
-              <th>Operation</th>
+              <th>Type</th>
+              <th>Activity</th>
               <th>Record</th>
-              <th>Actor</th>
-              <th>Details</th>
             </tr>
           </thead>
           <tbody>
-            {logs?.map((a) => (
-              <tr key={a.id}>
-                <td>{a.created_at}</td>
-                <td>{a.action}</td>
-                <td>
-                  {a.entity_type}
-                  <br />
-                  {a.entity_id}
+            {logs?.map((a) => {
+              const href = [
+                "leads",
+                "properties",
+                "inquiries",
+                "conversations",
+              ].includes(a.entity_type)
+                ? `/admin/${a.entity_type}/${a.entity_id}`
+                : null;
+              const details =
+                a.details &&
+                typeof a.details === "object" &&
+                !Array.isArray(a.details) &&
+                Array.isArray(a.details.changed_fields)
+                  ? a.details.changed_fields.join(", ")
+                  : "";
+              return (
+                <tr key={a.id}>
+                  <td data-l="When" className="first">
+                    {new Date(a.created_at).toLocaleString("en-US", {
+                      timeZone: "America/Chicago",
+                      month: "short",
+                      day: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
+                    <div className="em">Central time</div>
+                  </td>
+                  <td data-l="Type">
+                    <span className="badge s-Contacted">{a.action}</span>
+                  </td>
+                  <td data-l="Activity">
+                    <div className="nm">
+                      {a.entity_type.charAt(0).toUpperCase() +
+                        a.entity_type.slice(1)}{" "}
+                      {a.action === "INSERT"
+                        ? "created"
+                        : a.action === "DELETE"
+                          ? "deleted"
+                          : "updated"}
+                    </div>
+                    {details && <div className="em">Changed: {details}</div>}
+                    <div className="em">
+                      {a.actor_id
+                        ? `Staff ${a.actor_id.slice(0, 8)}`
+                        : "Server"}
+                    </div>
+                  </td>
+                  <td data-l="Record">
+                    {href ? (
+                      <Link
+                        style={{
+                          textDecoration: "underline",
+                          textUnderlineOffset: 3,
+                        }}
+                        href={href}
+                      >
+                        {a.entity_id}
+                      </Link>
+                    ) : (
+                      <span className="em" style={{ overflowWrap: "anywhere" }}>
+                        {a.entity_id}
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+            {!logs?.length && (
+              <tr>
+                <td colSpan={4}>
+                  <div className="empty">
+                    <b>No activity matches</b>Clear the filters.
+                  </div>
                 </td>
-                <td>{a.actor_id || "Server"}</td>
-                <td>{JSON.stringify(a.details)}</td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

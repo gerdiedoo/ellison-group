@@ -166,3 +166,7 @@ npm run audit:hosted-notes
 ```
 
 This command creates and deletes only marked temporary fixture accounts, a lead and a note. It exits 1 if an active agent can change the existing note’s author. No existing profile is promoted and no email invitations are sent.
+
+## Original admin design
+
+The `/admin` interface now uses the uploaded prototype’s original stylesheet, navigation artwork and screen layouts, connected to the existing CRM. See `docs/ADMIN_PARITY.md` for the restored screens and source-comparison test. Sidebar collapse, mobile navigation, property drawers, inline pipeline updates and profile sign-out are working interactions; real records determine the displayed numbers.

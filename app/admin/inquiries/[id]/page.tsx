@@ -1,3 +1,4 @@
+import { PageHeading } from "@/components/admin/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireStaff } from "@/lib/auth";
@@ -23,10 +24,10 @@ export default async function InquiryDetail({
   if (!inquiry.data) notFound();
   return (
     <>
-      <Link className="link" href="/admin/inquiries">
+      <Link className="crumb" href="/admin/inquiries">
         ← All inquiries
       </Link>
-      <h1>Inquiry</h1>
+      <PageHeading title="Inquiry" />
       <InquiryRecord inquiry={inquiry.data} team={team.data || []} />
     </>
   );

@@ -1,3 +1,4 @@
+import { PageHeading } from "@/components/admin/ui";
 import { queryValues } from "@/lib/validation";
 import { pageNumber } from "@/lib/validation";
 import Link from "next/link";
@@ -30,7 +31,10 @@ export default async function Inquiries({
     "/admin/inquiries?" + new URLSearchParams({ ...p, page: String(n) });
   return (
     <>
-      <h1>Inquiries</h1>
+      <PageHeading
+        title="Inquiries"
+        description="Review and assign website requests."
+      />
       <form className="toolbar">
         <div className="field">
           <label htmlFor="status">Status</label>
