@@ -21,6 +21,8 @@ If your local admin still shows an older interface, follow [LOCAL_PREVIEW.md](do
 
 ## Environment
 
+For the Vercel prototype, follow [VERCEL.md](docs/VERCEL.md): import this repository, deploy **development**, set the existing environment variables and update the Supabase callback allowlist. The repository includes Vercel build configuration; account connection and hosted deployment remain separate steps.
+
 | Variable                               | Purpose                                                                                                                   |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | `NEXT_PUBLIC_SUPABASE_URL`             | Supabase project URL                                                                                                      |
