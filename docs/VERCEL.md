@@ -1,5 +1,8 @@
 # Vercel prototype deployment
 
+> Historical prototype instructions. For the multi-environment rollout and pending
+> branch cutover, use [ENVIRONMENTS.md](ENVIRONMENTS.md).
+
 The application is prepared for Vercel's Next.js runtime. `vercel.json` uses the existing production build and locked dependency installation. Supabase remains the shared backend. No account is linked and no deployment is implied by these files.
 
 ## 1. Import the repository

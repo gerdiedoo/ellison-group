@@ -220,6 +220,11 @@ async function run() {
   }
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY)
     throw new Error("Configure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in the server environment or ignored .env.local.");
+  const targetUrl = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL);
+  const localTarget = ["localhost", "127.0.0.1", "[::1]"].includes(targetUrl.hostname);
+  const qaRef = process.env.SUPABASE_QA_PROJECT_REF;
+  if (!localTarget && (!qaRef || !/^[a-z0-9]{20}$/.test(qaRef) || targetUrl.origin !== `https://${qaRef}.supabase.co`))
+    throw new Error("Hosted demo writes require SUPABASE_QA_PROJECT_REF matching the QA API URL. Production demo writes are not supported.");
   const db = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY,

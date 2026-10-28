@@ -19,3 +19,8 @@ docker exec -i "$test_container" psql -U postgres -v ON_ERROR_STOP=1 < tests/dat
 docker exec -i "$test_container" psql -U postgres -v ON_ERROR_STOP=1 < tests/database/foundation.sql
 
 docker exec -i "$test_container" psql -U postgres -v ON_ERROR_STOP=1 < tests/database/audit.sql
+
+# Fixtures must survive repeat application without becoming public listings.
+docker exec -i "$test_container" psql -U postgres -v ON_ERROR_STOP=1 < supabase/seed.sql
+docker exec -i "$test_container" psql -U postgres -v ON_ERROR_STOP=1 < supabase/seed.sql
+docker exec -i "$test_container" psql -U postgres -v ON_ERROR_STOP=1 < tests/database/seed.sql

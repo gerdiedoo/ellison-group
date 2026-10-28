@@ -1,0 +1,14 @@
+NEXT_PUBLIC_SUPABASE_URL=https://REPLACE_WITH_PRODUCTION_PROJECT_REF.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+GOOGLE_GEMINI_API_KEY=
+GOOGLE_GEMINI_MODEL=gemini-flash-latest
+GOOGLE_GEMINI_FALLBACK_MODEL=gemini-3.1-flash-lite
+NEXT_PUBLIC_SITE_URL=https://REPLACE_WITH_PRODUCTION_HOST
+RATE_LIMIT_SALT=
+GOOGLE_OAUTH_ENABLED=false
+
+# Both Supabase public values must be supplied together.
+# Service-role and Gemini keys are server-only. Never prefix them with NEXT_PUBLIC_.
+# Generate RATE_LIMIT_SALT with: openssl rand -hex 32
+# Use the site origin without a path (http://localhost:3000 for development).
